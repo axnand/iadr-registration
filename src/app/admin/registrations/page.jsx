@@ -45,19 +45,22 @@ export default function AdminRegistrationsPage() {
     localStorage.removeItem("adminLoggedIn");
     router.push("/admin/login");
   };
-
-  if (loading) return <div className="flex justify-center items-center h-screen">
-  <div className="border-t-transparent border-[#377DFF] w-8 h-8 border-4 border-solid rounded-full animate-spin"></div> {/* Custom spinner style */}
-</div>;
+  console.log("register", registrations);
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="border-t-transparent border-[#377DFF] w-8 h-8 border-4 border-solid rounded-full animate-spin"></div>
+      </div>
+    );
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className=" p-4 pt-14 px-16 text-sm">
+    <div className="p-4 pt-14 px-16 text-[13px]">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Registrations</h1>
         <button
           onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-2 text-semibold rounded"
+          className="bg-red-600 text-white px-4 py-2 font-semibold rounded"
         >
           Logout
         </button>
@@ -73,12 +76,13 @@ export default function AdminRegistrationsPage() {
             <th className="px-4 py-2 border border-gray-300">Category</th>
             <th className="px-4 py-2 border border-gray-300">Event Type</th>
             <th className="px-4 py-2 border border-gray-300">Payment ID</th>
+            <th className="px-4 py-2 border border-gray-300">Accompanying Persons</th>
             <th className="px-4 py-2 border border-gray-300">Submitted At</th>
           </tr>
         </thead>
         <tbody>
           {registrations.map((reg) => (
-            <tr key={reg._id} className="text-sm">
+            <tr key={reg._id} className="text-[13px]">
               <td className="px-4 py-2 border border-gray-300">{reg.fullName}</td>
               <td className="px-4 py-2 border border-gray-300">{reg.email}</td>
               <td className="px-4 py-2 border border-gray-300">{reg.phone}</td>
@@ -89,6 +93,11 @@ export default function AdminRegistrationsPage() {
               <td className="px-4 py-2 border border-gray-300">
                 {reg.paymentId || "N/A"}
               </td>
+              <td className="px-4 py-2 border border-gray-300">
+  {reg.accompanyingPersons && reg.accompanyingPersons.length > 0
+    ? `${reg.numberOfAccompanying} (${reg.accompanyingPersons.map((person) => person.name).join(", ")})`
+    : "N/A"}
+</td>
               <td className="px-4 py-2 border border-gray-300">
                 {new Date(reg.createdAt).toLocaleString()}
               </td>

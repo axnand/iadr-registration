@@ -96,21 +96,21 @@ const eventTypes = ["WWW9 Meeting Fee", "IADR-APR Fee", "Combo (WWW9 & IADR-APR)
 const accompanyingOptions = ["No", "Yes"];
 
 export default function RegistrationForm() {
-  const [formData, setFormData] = useState({
-    title: "",
-    fullName: "",
-    email: "",
-    phone: "",
-    city: "",
-    country: "",
-    pincode: "",
-    address: "",
-    category: "",
-    eventType: "",
-    accompanying: "No",
-    numberOfAccompanying: 0,
-    accompanyingPersons: [],
-  });
+    const [formData, setFormData] = useState({
+        title: "",
+        fullName: "",
+        email: "",
+        phone: "",
+        city: "",
+        country: "",
+        pincode: "",
+        address: "",
+        category: "",
+        eventType: "",
+        accompanying: "No",
+        numberOfAccompanying: 0,
+        accompanyingPersons: [], // Array of objects like [{ name: "John Doe" }]
+      });
   const [totalAmount, setTotalAmount] = useState(0);
   const [errors, setErrors] = useState({});
   const [registrationComplete, setRegistrationComplete] = useState(false);
@@ -157,6 +157,7 @@ export default function RegistrationForm() {
       accompanyingPersons: value === "Yes" ? [{ name: "" }] : [],
     }));
   };
+  
 
   const handleAccompanyingPersonChange = (index, value) => {
     setFormData((prev) => {
@@ -168,12 +169,18 @@ export default function RegistrationForm() {
 
   const handleNumberOfAccompanyingChange = (value) => {
     const number = Number.parseInt(value, 10);
-    setFormData((prev) => ({
-      ...prev,
-      numberOfAccompanying: number,
-      accompanyingPersons: Array(number).fill({ name: "" }),
-    }));
+    setFormData((prev) => {
+      const newAccompanyingPersons = Array.from({ length: number }, (_, i) => {
+        return prev.accompanyingPersons[i] || { name: "" };
+      });
+      return {
+        ...prev,
+        numberOfAccompanying: number,
+        accompanyingPersons: newAccompanyingPersons,
+      };
+    });
   };
+  
 
   const validateForm = () => {
     const newErrors = {};
@@ -220,7 +227,7 @@ export default function RegistrationForm() {
         alert("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
 
         const registrationData = { ...formData, paymentId: response.razorpay_payment_id };
-        
+
         // Post registration data to your API endpoint
         try {
           const res = await fetch("/api/registrations", {
@@ -451,22 +458,24 @@ export default function RegistrationForm() {
             )}
 
             {/* Accompanying Persons Fields */}
-            {formData.accompanyingPersons.map((person, index) => (
-              <div key={index} className="space-y-2">
-                <Label htmlFor={`accompanying-person-${index}`}>
-                  Accompanying Person {index + 1} Name
-                </Label>
-                <Input
-                  id={`accompanying-person-${index}`}
-                  name={`accompanyingPerson${index}`}
-                  value={person.name}
-                  onChange={(e) =>
-                    handleAccompanyingPersonChange(index, e.target.value)
-                  }
-                  required
-                />
-              </div>
-            ))}
+            {formData.accompanying === "Yes" &&
+  formData.accompanyingPersons.map((person, index) => (
+    <div key={index} className="space-y-2">
+      <Label htmlFor={`accompanying-person-${index}`}>
+        Accompanying Person {index + 1} Name
+      </Label>
+      <Input
+        id={`accompanying-person-${index}`}
+        name={`accompanyingPerson${index}`}
+        value={person.name}
+        onChange={(e) =>
+          handleAccompanyingPersonChange(index, e.target.value)
+        }
+        required
+      />
+    </div>
+  ))
+}
 
             {/* Total Amount */}
             <div className="space-y-2">

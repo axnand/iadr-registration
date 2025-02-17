@@ -13,10 +13,16 @@ const RegistrationSchema = new mongoose.Schema({
   eventType: { type: String, required: true },
   accompanying: { type: String, required: true },
   numberOfAccompanying: { type: Number, required: true },
-  paymentId: { type: String }, // new field to store Razorpay Payment ID
+  // New field to store details of accompanying persons
+  accompanyingPersons: [
+    {
+      name: { type: String, required: true },
+    },
+  ],
+  paymentId: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
-// Prevent model overwrite during hot reload
+// Prevent model overwrite during hot reloads
 export default mongoose.models.Registration ||
   mongoose.model("Registration", RegistrationSchema);
