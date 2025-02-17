@@ -3,11 +3,47 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+// Predefined options
+const titles = ["Mr.", "Mrs.", "Ms.", "Dr."];
+const categories = [
+  "ISDR Member",
+  "Non-Member (Delegate)",
+  "Student: UG/PG/PhD (ISDR Member)",
+  "Student: UG/PG/PhD (Non-Member)",
+  "International Delegate (IADR Member)",
+  "International Delegate (Non-IADR Member)",
+];
+const eventTypes = ["WWW9 Meeting Fee", "IADR-APR Fee", "Combo (WWW9 & IADR-APR)"];
+const accompanyingOptions = ["No", "Yes"];
+
 export default function AdminRegistrationsPage() {
   const router = useRouter();
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [accompanyingText, setAccompanyingText] = useState("");
+  
+  // New entry states
+  const [isAdding, setIsAdding] = useState(false);
+  const [newEntryData, setNewEntryData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    city: "",
+    country: "",
+    pincode: "",
+    address: "",
+    category: categories[0] || "",
+    eventType: eventTypes[0] || "",
+    paymentId: "",
+    accompanying: "No",
+    numberOfAccompanying: 0, // default value added
+    accompanyingPersons: [],
+  });
+  const [newAccompanyingText, setNewAccompanyingText] = useState("");
 
   // Check for admin login on mount. If not logged in, redirect to login.
   useEffect(() => {
@@ -40,12 +76,172 @@ export default function AdminRegistrationsPage() {
     fetchRegistrations();
   }, []);
 
-  // Logout function clears the admin flag and redirects to login page.
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem("adminLoggedIn");
     router.push("/admin/login");
   };
-  console.log("register", registrations);
+
+  // Delete a registration by its ID
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this registration?")) return;
+    try {
+      const res = await fetch(`/api/registrations?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRegistrations((prev) => prev.filter((reg) => reg._id !== id));
+      } else {
+        alert("Delete failed: " + data.error);
+      }
+    } catch (err) {
+      alert("Error deleting: " + err.message);
+    }
+  };
+
+  // Start editing a registration
+  const handleEdit = (registration) => {
+    setEditingId(registration._id);
+    setEditData(registration);
+    if (registration.accompanyingPersons && registration.accompanyingPersons.length > 0) {
+      setAccompanyingText(registration.accompanyingPersons.map((p) => p.name).join(", "));
+    } else {
+      setAccompanyingText("");
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditData({});
+  };
+
+  // Handle changes in edit form for regular fields
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // For accompanying persons editing (edit mode)
+  const handleAccompanyingTextChange = (e) => {
+    setAccompanyingText(e.target.value);
+  };
+
+  // On blur, update editData with parsed accompanying persons
+  const handleBlurAccompanying = () => {
+    const names = accompanyingText
+      .split(",")
+      .map((n) => n.trim())
+      .filter((n) => n.length > 0);
+    setEditData((prev) => ({ ...prev, accompanyingPersons: names.map((name) => ({ name })) }));
+  };
+
+  // Save updated registration data
+  const handleSaveEdit = async () => {
+    try {
+      const res = await fetch("/api/registrations", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editData),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRegistrations((prev) =>
+          prev.map((reg) => (reg._id === editingId ? data.registration : reg))
+        );
+        setEditingId(null);
+        setEditData({});
+      } else {
+        alert("Update failed: " + data.error);
+      }
+    } catch (err) {
+      alert("Error updating: " + err.message);
+    }
+  };
+
+  // New entry handlers
+  const handleNewEntryChange = (e) => {
+    const { name, value } = e.target;
+    setNewEntryData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNewAccompanyingTextChange = (e) => {
+    setNewAccompanyingText(e.target.value);
+  };
+
+  const handleNewBlurAccompanying = () => {
+    const names = newAccompanyingText
+      .split(",")
+      .map((n) => n.trim())
+      .filter((n) => n.length > 0);
+    // Update accompanyingPersons and also set numberOfAccompanying based on the length
+    setNewEntryData((prev) => ({
+      ...prev,
+      accompanyingPersons: names.map((name) => ({ name })),
+      numberOfAccompanying: names.length, // update count here
+    }));
+  };
+  
+
+  const handleAddNewEntry = async () => {
+    // Parse accompanying persons from the newAccompanyingText
+    const names = newAccompanyingText
+      .split(",")
+      .map((n) => n.trim())
+      .filter((n) => n.length > 0);
+    const updatedData = {
+      ...newEntryData,
+      accompanyingPersons: names.map((name) => ({ name })),
+      numberOfAccompanying: names.length, // explicitly set the count here
+    };
+  
+    try {
+      const res = await fetch("/api/registrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRegistrations((prev) => [data.registration, ...prev]);
+        setIsAdding(false);
+        // Reset new entry state
+        setNewEntryData({
+          fullName: "",
+          email: "",
+          phone: "",
+          city: "",
+          country: "",
+          pincode: "",
+          address: "",
+          category: categories[0] || "",
+          eventType: eventTypes[0] || "",
+          paymentId: "",
+          accompanying: "No",
+          numberOfAccompanying: 0,
+          accompanyingPersons: [],
+        });
+        setNewAccompanyingText("");
+      } else {
+        alert("Add entry failed: " + data.error);
+      }
+    } catch (err) {
+      alert("Error adding entry: " + err.message);
+    }
+  };
+  
+
+  // Filter registrations by search query (fullName, email, or phone)
+  const filteredRegistrations = registrations.filter((reg) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      reg.fullName.toLowerCase().includes(query) ||
+      reg.email.toLowerCase().includes(query) ||
+      reg.phone.toLowerCase().includes(query)
+    );
+  });
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -55,16 +251,172 @@ export default function AdminRegistrationsPage() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="p-4 pt-14 px-16 text-[13px]">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 pt-14 md:px-16 text-[13px]">
+      <div className="flex md:flex-row flex-col md:justify-between md:items-center mb-6 gap-y-4">
         <h1 className="text-3xl font-bold">Registrations</h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-2 font-semibold rounded"
-        >
-          Logout
-        </button>
+        <div className="flex gap-x-4">
+          <button
+            onClick={() => setIsAdding(true)}
+            className="bg-green-600 text-white px-4 py-2 font-semibold rounded"
+          >
+            Add New Entry
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 text-white px-4 py-2 font-semibold rounded"
+          >
+            Logout
+          </button>
+        </div>
       </div>
+
+      {/* New Entry Form */}
+      {isAdding && (
+        <div className="mb-6 border border-gray-300 p-4 rounded">
+          <h2 className="text-xl font-bold mb-4">Add New Registration</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full Name"
+              value={newEntryData.fullName}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={newEntryData.email}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Phone"
+              value={newEntryData.phone}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+            <input
+              type="text"
+              name="city"
+              placeholder="City"
+              value={newEntryData.city}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+            <input
+              type="text"
+              name="country"
+              placeholder="Country"
+              value={newEntryData.country}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+            <input
+              type="text"
+              name="pincode"
+              placeholder="Pincode"
+              value={newEntryData.pincode}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+            <textarea
+              name="address"
+              placeholder="Address"
+              value={newEntryData.address}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+            {/* Select for Category */}
+            <select
+              name="category"
+              value={newEntryData.category}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            >
+              {categories.map((cat, index) => (
+                <option key={index} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            {/* Select for Event Type */}
+            <select
+              name="eventType"
+              value={newEntryData.eventType}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            >
+              {eventTypes.map((type, index) => (
+                <option key={index} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+            {/* Payment ID */}
+            <input
+              type="text"
+              name="paymentId"
+              placeholder="Payment ID"
+              value={newEntryData.paymentId}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+            />
+            {/* Accompanying Option */}
+            <select
+              name="accompanying"
+              value={newEntryData.accompanying}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            >
+              {accompanyingOptions.map((option, index) => (
+                <option key={index} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            {/* Accompanying Persons (as comma-separated list) */}
+            <input
+              type="text"
+              name="accompanyingPersons"
+              placeholder="Accompanying Persons (comma separated)"
+              value={newAccompanyingText}
+              onChange={handleNewAccompanyingTextChange}
+              onBlur={handleNewBlurAccompanying}
+              className="border p-2"
+            />
+          </div>
+          <div className="mt-4 flex gap-x-4">
+            <button
+              onClick={handleAddNewEntry}
+              className="bg-green-600 text-white px-4 py-2 font-semibold rounded"
+            >
+              Save New Entry
+            </button>
+            <button
+              onClick={() => setIsAdding(false)}
+              className="bg-gray-600 text-white px-4 py-2 font-semibold rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Registrations Table */}
       <table className="min-w-full table-auto border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -76,30 +428,209 @@ export default function AdminRegistrationsPage() {
             <th className="px-4 py-2 border border-gray-300">Category</th>
             <th className="px-4 py-2 border border-gray-300">Event Type</th>
             <th className="px-4 py-2 border border-gray-300">Payment ID</th>
-            <th className="px-4 py-2 border border-gray-300">Accompanying Persons</th>
+            <th className="px-4 py-2 border border-gray-300">
+              Accompanying Persons
+            </th>
             <th className="px-4 py-2 border border-gray-300">Submitted At</th>
+            <th className="px-4 py-2 border border-gray-300">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {registrations.map((reg) => (
+          {filteredRegistrations.map((reg) => (
             <tr key={reg._id} className="text-[13px]">
-              <td className="px-4 py-2 border border-gray-300">{reg.fullName}</td>
-              <td className="px-4 py-2 border border-gray-300">{reg.email}</td>
-              <td className="px-4 py-2 border border-gray-300">{reg.phone}</td>
-              <td className="px-4 py-2 border border-gray-300">{reg.city}</td>
-              <td className="px-4 py-2 border border-gray-300">{reg.country}</td>
-              <td className="px-4 py-2 border border-gray-300">{reg.category}</td>
-              <td className="px-4 py-2 border border-gray-300">{reg.eventType}</td>
+              {/* Full Name */}
               <td className="px-4 py-2 border border-gray-300">
-                {reg.paymentId || "N/A"}
+                {editingId === reg._id ? (
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={editData.fullName || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  />
+                ) : (
+                  reg.fullName
+                )}
               </td>
+              {/* Email */}
               <td className="px-4 py-2 border border-gray-300">
-  {reg.accompanyingPersons && reg.accompanyingPersons.length > 0
-    ? `${reg.numberOfAccompanying} (${reg.accompanyingPersons.map((person) => person.name).join(", ")})`
-    : "N/A"}
-</td>
+                {editingId === reg._id ? (
+                  <input
+                    type="email"
+                    name="email"
+                    value={editData.email || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  />
+                ) : (
+                  reg.email
+                )}
+              </td>
+              {/* Phone */}
               <td className="px-4 py-2 border border-gray-300">
-                {new Date(reg.createdAt).toLocaleString()}
+                {editingId === reg._id ? (
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={editData.phone || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  />
+                ) : (
+                  reg.phone
+                )}
+              </td>
+              {/* City */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <input
+                    type="text"
+                    name="city"
+                    value={editData.city || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  />
+                ) : (
+                  reg.city
+                )}
+              </td>
+              {/* Country */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <input
+                    type="text"
+                    name="country"
+                    value={editData.country || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  />
+                ) : (
+                  reg.country
+                )}
+              </td>
+              {/* Category (select dropdown) */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <select
+                    name="category"
+                    value={editData.category || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                    required
+                  >
+                    {categories.map((cat, idx) => (
+                      <option key={idx} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  reg.category
+                )}
+              </td>
+              {/* Event Type (select dropdown) */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <select
+                    name="eventType"
+                    value={editData.eventType || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                    required
+                  >
+                    {eventTypes.map((type, idx) => (
+                      <option key={idx} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  reg.eventType
+                )}
+              </td>
+              {/* Payment ID */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <input
+                    type="text"
+                    name="paymentId"
+                    value={editData.paymentId || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  />
+                ) : (
+                  reg.paymentId || "N/A"
+                )}
+              </td>
+              {/* Accompanying Persons */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <input
+                    type="text"
+                    name="accompanyingPersons"
+                    value={accompanyingText}
+                    onChange={handleAccompanyingTextChange}
+                    onBlur={handleBlurAccompanying}
+                    className="border p-1"
+                  />
+                ) : reg.accompanyingPersons &&
+                  Array.isArray(reg.accompanyingPersons) &&
+                  reg.accompanyingPersons.length > 0 ? (
+                  `${reg.accompanyingPersons.length} (${reg.accompanyingPersons
+                    .map((person) => person.name)
+                    .join(", ")})`
+                ) : (
+                  "N/A"
+                )}
+              </td>
+              {/* Submitted At */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <input
+                    type="text"
+                    name="createdAt"
+                    value={new Date(editData.createdAt).toLocaleString() || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                    disabled
+                  />
+                ) : (
+                  new Date(reg.createdAt).toLocaleString()
+                )}
+              </td>
+              {/* Actions */}
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <div className="flex flex-col gap-y-1">
+                    <button
+                      onClick={handleSaveEdit}
+                      className="bg-green-600 text-white px-2 py-1 mr-2 rounded text-xs"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="bg-gray-600 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-y-1">
+                    <button
+                      onClick={() => handleEdit(reg)}
+                      className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(reg._id)}
+                      className="bg-red-600 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </td>
             </tr>
           ))}
