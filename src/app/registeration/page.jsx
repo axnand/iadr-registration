@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { calculateTotalAmount } from "./pricing-logic";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 
@@ -21,6 +25,7 @@ const eventTypes = ["WWW9 Meeting Fee", "IADR-APR Fee", "Combo (WWW9 & IADR-APR)
 const accompanyingOptions = ["No", "Yes"];
 
 export default function RegistrationForm() {
+  const router = useRouter();
     const [formData, setFormData] = useState({
         title: "",
         fullName: "",
@@ -30,7 +35,7 @@ export default function RegistrationForm() {
         country: "",
         pincode: "",
         address: "",
-        category: "",  // You might also consider a default here if appropriate.
+        category: categories[0] || "",  // You might also consider a default here if appropriate.
         eventType: eventTypes[0] || "", // Default to the first event type.
         accompanying: "No",
         numberOfAccompanying: 0,
@@ -122,8 +127,8 @@ export default function RegistrationForm() {
 
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = "Phone number should be 10 digits";
+    } else if (!/^(?:\+\d{1,3}\s)?\d{7,15}$/.test(formData.phone)) {
+      newErrors.phone = "Please enter a valid international phone number (7-15 digits, optional leading + and space)";
     }
 
     setErrors(newErrors);
@@ -136,24 +141,27 @@ export default function RegistrationForm() {
       console.log("Form has errors:", errors);
       return;
     }
-
-    // Convert totalAmount (INR) to paise
-    const amountInPaise = totalAmount * 100;
-
+  
+    // Destructure amount and currency from calculateTotalAmount:
+    const { amount, currency } = await calculateTotalAmount(
+      formData.category,
+      formData.eventType,
+      formData.numberOfAccompanying,
+      new Date()
+    );
+  
     const options = {
-      // Use public environment variable for Razorpay key.
       key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY,
-      amount: amountInPaise, // Amount in paise
-      currency: "INR",
+      amount, // amount in smallest unit (paise for INR, cents for USD)
+      currency, // "INR" or "USD"
       name: "Event Registration",
       description: "Payment for event registration",
       handler: async function (response) {
         console.log("Payment successful:", response);
-        alert("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
-
+        toast.success("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
+        
         const registrationData = { ...formData, paymentId: response.razorpay_payment_id };
-
-        // Post registration data to your API endpoint
+  
         try {
           const res = await fetch("/api/registrations", {
             method: "POST",
@@ -163,12 +171,13 @@ export default function RegistrationForm() {
           const data = await res.json();
           if (data.success) {
             setRegistrationComplete(true);
+            toast.success("Registration successful!");
           } else {
-            alert("Payment succeeded, but registration failed: " + data.error);
+            toast.error("Payment succeeded, but registration failed: " + data.error);
           }
         } catch (error) {
           console.error("Error submitting registration:", error);
-          alert("Payment succeeded, but registration submission encountered an error.");
+          toast.error("Payment succeeded, but registration submission encountered an error.");
         }
       },
       prefill: {
@@ -180,10 +189,11 @@ export default function RegistrationForm() {
         color: "#3399cc",
       },
     };
-
+  
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -198,22 +208,33 @@ export default function RegistrationForm() {
   return (
     <div className="w-full h-full ">
       <div className="py-5 shadow-md ">
+        <Link href={"https://iadrapr2025.com"}>
         <div
   className="p-4 flex justify-start md:h-24 h-20 w-full "
   style={{ backgroundImage: 'url(/logo.jpg)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}
 >
+
   {/* Optionally, you can add text or other elements inside the div */}
-</div>
+</div></Link>
 </div>
 
     <div className="max-w-2xl mt-6 mx-auto p-4">
-    <h1 className="md:text-4xl text-2xl font-extrabold mb-8 text-[#2f3644]">Registration Form</h1>
+    
     {registrationComplete ? (
-      <div className="text-center py-10">
-        <h2 className="text-2xl font-bold">Thanks for registering!</h2>
-        <p className="mt-4">We have received your registration details.</p>
-      </div>
-    ) : (
+      <div className=" flex flex-col items-center justify-center p-4">
+      <h1 className="text-4xl font-extrabold mb-4">Thank You for Registering!</h1>
+      <p className=" mb-8 text-center">
+        We have received your registration details. Our team will contact you shortly.
+      </p>
+      <a
+        href="https://iadrapr2025.com"
+        className="bg-white text-blue-500 font-bold py-2 px-6 rounded hover:bg-gray-100 transition"
+      >
+        Return Home
+      </a>
+    </div>
+    ) : (<>
+      <h1 className="md:text-4xl text-2xl font-extrabold mb-8 text-[#2f3644]">Registration Form</h1>
       <form onSubmit={handleSubmit} className="space-y-6 ">
         {/* Row 1: Title & Full Name */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[14px]">
@@ -272,21 +293,25 @@ export default function RegistrationForm() {
             )}
           </div>
           <div>
-            <label htmlFor="phone" className="block text-gray-700 font-medium pb-2 text-sm">
-              Phone Number
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              onChange={handleInputChange}
-              className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
-              required
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-xs">{errors.phone}</p>
-            )}
-          </div>
+  <label htmlFor="phone" className="block text-gray-700 font-medium pb-2 text-sm">
+    Phone Number
+  </label>
+  <input
+    id="phone"
+    name="phone"
+    placeholder="+91 999999999 or +1 5555555555"
+    type="tel"
+    onChange={handleInputChange}
+    className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
+    required
+    pattern="^\+?[0-9]{7,15}$"  // Allows an optional plus sign and 7 to 15 digits
+    title="Please enter a valid international phone number (7-15 digits, optional leading +)"
+  />
+  {errors.phone && (
+    <p className="text-red-500 text-xs">{errors.phone}</p>
+  )}
+</div>
+
         </div>
 
         {/* Row 3: City & Country */}
@@ -307,19 +332,14 @@ export default function RegistrationForm() {
             <label htmlFor="country" className="block text-gray-700 font-medium pb-2 text-sm">
               Country
             </label>
-            <select
+            <input
               id="country"
               name="country"
-              value={formData.country}
-              onChange={(e) => handleSelectChange("country", e.target.value)}
+              onChange={handleInputChange}
               className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
-            >
-              <option value="">Select country</option>
-              <option value="india">India</option>
-              <option value="usa">USA</option>
-              <option value="uk">UK</option>
-              <option value="australia">Australia</option>
-            </select>
+              required
+            />
+            
           </div>
         </div>
 
@@ -365,7 +385,7 @@ export default function RegistrationForm() {
             className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
             required
           >
-            <option value="">Select category</option>
+            <option value="">None</option>
             {categories.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
@@ -387,8 +407,9 @@ export default function RegistrationForm() {
   className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
   required
 >
-  <option value="">Select event type</option>
+  <option value="">None</option>
   {eventTypes.map((type) => (
+    
     <option key={type} value={type}>
       {type}
     </option>
@@ -463,7 +484,12 @@ export default function RegistrationForm() {
         {/* Row 12: Total Amount */}
         <div className="text-[13px]">
           <label className="block text-gray-700 font-medium pb-2 text-sm">Total Amount Payable</label>
-          <div className="text-2xl font-bold">₹{totalAmount.toFixed(2)}</div>
+          <div className="text-2xl font-bold">
+  {totalAmount.currency === "INR"
+    ? "₹" + (totalAmount.amount / 100).toFixed(2)
+    : "$" + (totalAmount.amount / 100).toFixed(2)}
+</div>
+
         </div>
 
         {/* Row 13: Cancellation Policy */}
@@ -485,8 +511,10 @@ export default function RegistrationForm() {
           </button>
         </div>
       </form>
+      </>
     )}
   </div>
+  <ToastContainer />
   </div>
   );
 }

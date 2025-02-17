@@ -13,7 +13,7 @@ const categories = [
   "International Delegate (IADR Member)",
   "International Delegate (Non-IADR Member)",
 ];
-const eventTypes = ["WWW9 Meeting Fee", "IADR-APR Fee", "Combo (WWW9 & IADR-APR)"];
+const eventTypes = ["WWW9 Meeting Fee", "IADR-APR Fee", "Combo (WWW9 & IADR-APR)", "None"];
 const accompanyingOptions = ["No", "Yes"];
 
 export default function AdminRegistrationsPage() {
@@ -93,10 +93,10 @@ export default function AdminRegistrationsPage() {
       if (data.success) {
         setRegistrations((prev) => prev.filter((reg) => reg._id !== id));
       } else {
-        alert("Delete failed: " + data.error);
+        toast.error("Delete failed: " + data.error);
       }
     } catch (err) {
-      alert("Error deleting: " + err.message);
+      toast.error("Error deleting: " + err.message);
     }
   };
 
@@ -153,10 +153,9 @@ export default function AdminRegistrationsPage() {
         setEditingId(null);
         setEditData({});
       } else {
-        alert("Update failed: " + data.error);
-      }
+        toast.error("Update failed: " + data.error);      }
     } catch (err) {
-      alert("Error updating: " + err.message);
+      toast.error("Error updating: " + err.message);
     }
   };
 
@@ -251,7 +250,7 @@ export default function AdminRegistrationsPage() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="p-4 pt-14 md:px-16 text-[13px]">
+    <div className="p-4 pt-14 md:mx-auto text-[13px]">
       <div className="flex md:flex-row flex-col md:justify-between md:items-center mb-6 gap-y-4">
         <h1 className="text-3xl font-bold">Registrations</h1>
         <div className="flex gap-x-4">

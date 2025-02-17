@@ -148,7 +148,7 @@ export async function calculateTotalAmount(
   const usdToInrRate = await getUsdToInrRate();
   let totalInINR = 0;
 
-  // 2) Determine tier (Early Bird, Standard, Late)
+  let totalUSD = 0;
   const pricingTier = getPricingTier(currentDate);
 
   // 3) Category-based price
@@ -156,7 +156,7 @@ export async function calculateTotalAmount(
     const basePrice = categoryPricing[category][pricingTier];
     const currency = categoryPricing[category].currency;
     if (currency === "USD") {
-      totalInINR += basePrice * usdToInrRate;
+      totalUSD += basePrice;
     } else {
       totalInINR += basePrice;
     }
@@ -171,7 +171,7 @@ export async function calculateTotalAmount(
 
     if (typeof price === "number") {
       if (currency === "USD") {
-        totalInINR += price * usdToInrRate;
+        totalUSD += price;
       } else {
         totalInINR += price;
       }
@@ -185,18 +185,14 @@ export async function calculateTotalAmount(
     totalInINR += accompanyBase * numberOfAccompanying;
   }
 
-  // 6) Apply 18% GST for domestic participants (not "International Delegate")
-  //    (You can skip if your table already includes GST in the base price. 
-  //     But from your screenshot, it looks like you've combined base + GST 
-  //     for the category-based amounts. For event-based amounts, we still 
-  //     add GST for Indian delegates.)
-  if (
-    !category.toLowerCase().includes("international delegate") &&
-    eventTypePricing[eventType] // only if event-based pricing is used
-  ) {
-    // This is optional if your base event prices for Indian delegates
-    // do not already include GST. If they do, remove or adjust this.
-    totalInINR = Math.round(totalInINR * 1.18);
+  if (categoryPricing[category] && categoryPricing[category].currency === "USD") {
+    // Return amount in USD (convert dollars to cents)
+    const totalCents = Math.round(totalUSD * 100);
+    return { amount: totalCents, currency: "USD" };
+  } else {
+    // Return amount in INR (convert rupees to paise)
+    const totalPaise = Math.round(totalInINR * 100);
+    return { amount: totalPaise, currency: "INR" };
   }
 
   return Math.round(totalInINR);
