@@ -1,9 +1,9 @@
 import React from 'react'
-import RegistrationForm from './registeration/page'
+import AdminLoginPage from './login/page'
 
 function page() {
   return (
-    <RegistrationForm/>
+    <AdminLoginPage/>
   )
 }
 
