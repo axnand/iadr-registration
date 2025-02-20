@@ -28,8 +28,8 @@ const ww9ComboCategories = [
 ];
 
 const eventTypes = [
-  "WWW9 Meeting Fee",
-  "IADR-APR Fee",
+  "WWW9 Meeting",
+  "IADR-APR",
   "Combo (WWW9 & IADR-APR)",
 ];
 
