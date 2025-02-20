@@ -47,7 +47,7 @@ export default function RegistrationForm() {
     country: "",
     pincode: "",
     address: "",
-    category: "", 
+    category: ww9ComboCategories[0] || "", 
     eventType: eventTypes[0] || "",
     accompanying: "No",
     numberOfAccompanying: 0,
