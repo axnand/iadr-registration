@@ -15,7 +15,6 @@ const iadrCategories = [
   "Non-Member (Delegate)",
   "Student (ISDR Member)",
   "Student (Non-Member)",
-  "Accompanying Person",
   "International Delegate (IADR Member)",
   "International Delegate (Non-IADR Member)",
 ];
