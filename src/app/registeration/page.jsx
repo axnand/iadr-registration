@@ -98,7 +98,7 @@ export default function RegistrationForm() {
       setFormData((prev) => ({
         ...prev,
         eventType: value,
-        category: value === "IADR-APR Fee" ? iadrCategories[0] : ww9ComboCategories[0],
+        category: value === "IADR-APR" ? iadrCategories[0] : ww9ComboCategories[0],
       }));
     } else {
       setFormData((prev) => ({
@@ -320,7 +320,7 @@ export default function RegistrationForm() {
                   className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                   required
                 >
-                  {formData.eventType === "IADR-APR Fee"
+                  {formData.eventType === "IADR-APR"
                     ? iadrCategories.map((cat) => (
                         <option key={cat} value={cat}>
                           {cat}

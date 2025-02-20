@@ -28,7 +28,7 @@ const iadrAprPricing = {
 };
 
 const eventTypePricing = {
-  "WWW9 Meeting Fee": {
+  "WWW9 Meeting": {
     "International Delegate": { amount: 275, currency: "USD" },
     "International Delegate (Asia Pacific)": { amount: 250, currency: "USD" },
     "Indian Delegate": { amount: 11000, currency: "INR" },
@@ -46,10 +46,10 @@ const eventTypePricing = {
 };
 
 const accompanyingPersonPricing = {
-  "WWW9 Meeting Fee": {
+  "WWW9 Meeting": {
     "Accompanying Person": { amount: 11000, currency: "INR" }
   },
-  "IADR-APR Fee": {
+  "IADR-APR": {
     "Accompanying Person (Non-Dentist)": { earlyBird: 15340, standard: 17700, late: 17700, currency: "INR" }
   },
   "Combo (WWW9 & IADR-APR)": {
@@ -75,7 +75,7 @@ export async function calculateTotalAmount(category, eventType, numberOfAccompan
   const usdToInrRate = await getUsdToInrRate();
 
   // Calculate base fee from either the IADR-APR or eventTypePricing table
-  if (eventType === "IADR-APR Fee" && iadrAprPricing[category]) {
+  if (eventType === "IADR-APR" && iadrAprPricing[category]) {
     baseFee = iadrAprPricing[category][pricingTier];
     currency = iadrAprPricing[category].currency;
   } else if (eventTypePricing[eventType] && eventTypePricing[eventType][category]) {
@@ -94,7 +94,7 @@ export async function calculateTotalAmount(category, eventType, numberOfAccompan
       totalAmount.amount += baseFee;
     } else {
       // Use a fixed key for accompanying person pricing based on the event type.
-      const accompanyKey = eventType === "IADR-APR Fee" ? "Accompanying Person (Non-Dentist)" : "Accompanying Person";
+      const accompanyKey = eventType === "IADR-APR" ? "Accompanying Person (Non-Dentist)" : "Accompanying Person";
       if (accompanyingPersonPricing[eventType] && accompanyingPersonPricing[eventType][accompanyKey]) {
         let accompanyCharge =
           accompanyingPersonPricing[eventType][accompanyKey].amount ||
