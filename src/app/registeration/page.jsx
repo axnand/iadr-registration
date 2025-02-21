@@ -166,7 +166,7 @@ export default function RegistrationForm() {
       newErrors.phone = "Phone number is required";
     } else if (!/^(?:\+\d{1,3}\s)?\d{7,15}$/.test(formData.phone)) {
       newErrors.phone =
-        "Please enter a valid international phone number (7-15 digits, optional leading + and space)";
+        "Please enter a valid international phone number (in the format +91 XXXXXXXXXX)";
     }
 
     setErrors(newErrors);
