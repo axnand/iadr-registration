@@ -23,7 +23,6 @@ const ww9ComboCategories = [
   "International Delegate",
   "International Delegate (Asia Pacific)",
   "Indian Delegate",
-  "Accompanying Person",
   "UG Students",
 ];
 
@@ -180,9 +179,12 @@ export default function RegistrationForm() {
       return;
     }
   
-    // Set a fixed amount of 1 rupee (100 paise)
-    const amount = 100;
-    const currency = "INR";
+    const { amount, currency } = await calculateTotalAmount(
+      formData.category,
+      formData.eventType,
+      formData.numberOfAccompanying,
+      new Date()
+    );
   
     // Create order on your server with the fixed amount
     let orderData;
@@ -299,30 +301,7 @@ export default function RegistrationForm() {
               Registration Form
             </h1>
             <form onSubmit={handleSubmit} className="space-y-6 ">
-              <div className="text-[13px]">
-                <label
-                  htmlFor="eventType"
-                  className="block text-gray-700 font-medium pb-2 text-sm"
-                >
-                  Event Type
-                </label>
-                <select
-                  id="eventType"
-                  name="eventType"
-                  value={formData.eventType}
-                  onChange={(e) => handleSelectChange("eventType", e.target.value)}
-                  className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
-                  required
-                >
-                  {eventTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="text-[13px]">
+            <div className="text-[13px]">
                 <label
                   htmlFor="category"
                   className="block text-gray-700 font-medium pb-2 text-sm"
@@ -350,6 +329,30 @@ export default function RegistrationForm() {
                       ))}
                 </select>
               </div>
+              <div className="text-[13px]">
+                <label
+                  htmlFor="eventType"
+                  className="block text-gray-700 font-medium pb-2 text-sm"
+                >
+                  Event Type
+                </label>
+                <select
+                  id="eventType"
+                  name="eventType"
+                  value={formData.eventType}
+                  onChange={(e) => handleSelectChange("eventType", e.target.value)}
+                  className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  required
+                >
+                  {eventTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              
 
               {/* Row 1: Title & Full Name */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[14px]">
