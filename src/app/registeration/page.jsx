@@ -203,17 +203,19 @@ export default function RegistrationForm() {
   
     // Configure Razorpay checkout options using the order_id from the API
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY,
-      amount, // amount in smallest unit (paise for INR, cents for USD)
-      currency, // "INR" or "USD"
+      key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY, // Ensure this is your live mode key
+      amount, // in paise
+      currency,
+      order_id: orderData.id, // Order ID returned from your API
       name: "Event Registration",
       description: "Payment for event registration",
       handler: async function (response) {
         console.log("Payment successful:", response);
         toast.success("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
-
+  
+        // Submit the registration data along with the payment ID
         const registrationData = { ...formData, paymentId: response.razorpay_payment_id };
-
+  
         try {
           const res = await fetch("/api/registrations", {
             method: "POST",
@@ -241,10 +243,13 @@ export default function RegistrationForm() {
         color: "#3399cc",
       },
     };
-
+  
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
+  
+  
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
