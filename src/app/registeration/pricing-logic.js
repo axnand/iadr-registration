@@ -20,8 +20,8 @@ async function getUsdToInrRate() {
 const iadrAprPricing = {
   "ISDR Member": { earlyBird: 15340, standard: 16520, late: 17700, currency: "INR" },
   "Non-Member (Delegate)": { earlyBird: 17700, standard: 20060, late: 23600, currency: "INR" },
-  "Student (ISDR Member)": { earlyBird: 14160, standard: 16520, late: 17700, currency: "INR" },
-  "Student (Non-Member)": { earlyBird: 14800, standard: 17700, late: 20060, currency: "INR" },
+  "Student (ISDR Member)": { earlyBird: 15340, standard: 17700, late: 17700, currency: "INR" },
+  "Student (Non-Member)": { earlyBird: 15340, standard: 17700, late: 20060, currency: "INR" },
   "Accompanying Person (Non-Dentist)": { earlyBird: 15340, standard: 17700, late: 17700, currency: "INR" },
   "International Delegate (IADR Member)": { earlyBird: 400, standard: 450, late: 500, currency: "USD" },
   "International Delegate (Non-IADR Member)": { earlyBird: 500, standard: 600, late: 700, currency: "USD" },
@@ -58,7 +58,7 @@ const accompanyingPersonPricing = {
 };
 
 function getPricingTier(currentDate) {
-  const earlyBirdEndDate = new Date("2025-02-28");
+  const earlyBirdEndDate = new Date("2025-03-15");
   const standardEndDate = new Date("2025-06-30");
 
   if (currentDate <= earlyBirdEndDate) return "earlyBird";

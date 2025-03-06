@@ -23,7 +23,6 @@ const ww9ComboCategories = [
   "International Delegate",
   "International Delegate (Asia Pacific)",
   "Indian Delegate",
-  "Accompanying Person",
   "UG Students",
 ];
 
@@ -179,15 +178,30 @@ export default function RegistrationForm() {
       console.log("Form has errors:", errors);
       return;
     }
-
-    // Destructure amount and currency from calculateTotalAmount:
+  
     const { amount, currency } = await calculateTotalAmount(
       formData.category,
       formData.eventType,
       formData.numberOfAccompanying,
       new Date()
     );
-
+  
+    // Create order on your server with the fixed amount
+    let orderData;
+    try {
+      const orderResponse = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, currency }),
+      });
+      orderData = await orderResponse.json();
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast.error("Error creating order. Please try again.");
+      return;
+    }
+  
+    // Configure Razorpay checkout options using the order_id from the API
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY,
       amount, // amount in smallest unit (paise for INR, cents for USD)
@@ -282,30 +296,7 @@ export default function RegistrationForm() {
               Registration Form
             </h1>
             <form onSubmit={handleSubmit} className="space-y-6 ">
-              <div className="text-[13px]">
-                <label
-                  htmlFor="eventType"
-                  className="block text-gray-700 font-medium pb-2 text-sm"
-                >
-                  Event Type
-                </label>
-                <select
-                  id="eventType"
-                  name="eventType"
-                  value={formData.eventType}
-                  onChange={(e) => handleSelectChange("eventType", e.target.value)}
-                  className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
-                  required
-                >
-                  {eventTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="text-[13px]">
+            <div className="text-[13px]">
                 <label
                   htmlFor="category"
                   className="block text-gray-700 font-medium pb-2 text-sm"
@@ -333,6 +324,30 @@ export default function RegistrationForm() {
                       ))}
                 </select>
               </div>
+              <div className="text-[13px]">
+                <label
+                  htmlFor="eventType"
+                  className="block text-gray-700 font-medium pb-2 text-sm"
+                >
+                  Event Type
+                </label>
+                <select
+                  id="eventType"
+                  name="eventType"
+                  value={formData.eventType}
+                  onChange={(e) => handleSelectChange("eventType", e.target.value)}
+                  className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  required
+                >
+                  {eventTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              
 
               {/* Row 1: Title & Full Name */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[14px]">
