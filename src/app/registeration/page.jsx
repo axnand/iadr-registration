@@ -27,8 +27,8 @@ const ww9ComboCategories = [
 ];
 
 const eventTypes = [
-  "WWW9 Meeting",
   "IADR-APR",
+  "WWW9 Meeting",
   "Combo (WWW9 & IADR-APR)",
 ];
 
@@ -45,8 +45,8 @@ export default function RegistrationForm() {
     country: "",
     pincode: "",
     address: "",
-    category: ww9ComboCategories[0] || "", 
-    eventType: eventTypes[0] || "",
+    eventType: "IADR-APR",
+    category: iadrCategories[0],
     accompanying: "No",
     numberOfAccompanying: 0,
     accompanyingPersons: [],
