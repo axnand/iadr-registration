@@ -523,6 +523,8 @@ export default function AdminRegistrationsPage() {
             <th className="px-4 py-2 border border-gray-300">Phone</th>
             <th className="px-4 py-2 border border-gray-300">City</th>
             <th className="px-4 py-2 border border-gray-300">Country</th>
+            <th className="px-4 py-2 border border-gray-300">Pincode</th>
+            <th className="px-4 py-2 border border-gray-300">Address</th>
             <th className="px-4 py-2 border border-gray-300">Category</th>
             <th className="px-4 py-2 border border-gray-300">Event Type</th>
             <th className="px-4 py-2 border border-gray-300">Amount Paid</th>
@@ -608,6 +610,32 @@ export default function AdminRegistrationsPage() {
                   reg.country
                 )}
               </td>
+              <td className="px-4 py-2 border border-gray-300">
+  {editingId === reg._id ? (
+    <input
+      type="text"
+      name="pincode"
+      value={editData.pincode || ""}
+      onChange={handleEditChange}
+      className="border p-1"
+    />
+  ) : (
+    reg.pincode
+  )}
+</td>
+<td className="px-4 py-2 border border-gray-300">
+  {editingId === reg._id ? (
+    <input
+      type="text"
+      name="address"
+      value={editData.address || ""}
+      onChange={handleEditChange}
+      className="border p-1"
+    />
+  ) : (
+    reg.address
+  )}
+</td>
               {/* Category (select dropdown) */}
               <td className="px-4 py-2 border border-gray-300">
                 {editingId === reg._id ? (
