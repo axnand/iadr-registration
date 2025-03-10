@@ -19,10 +19,12 @@ const RegistrationSchema = new mongoose.Schema({
       name: { type: String, required: true },
     },
   ],
+  amountPaid: { type: Number, required: true },
+  currency: { type: String, default: "INR" },
   paymentId: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
-// Prevent model overwrite during hot reloads
+
 export default mongoose.models.Registration ||
   mongoose.model("Registration", RegistrationSchema);

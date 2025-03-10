@@ -5,35 +5,52 @@ import Registrations from "../../../../models/Registrations";
 export async function GET() {
   try {
     await dbConnect();
-    const registrations = await Registrations.find({});
+    const registrations = await Registrations.find({}, "-__v"); // Exclude MongoDB versioning field
     return NextResponse.json({ success: true, registrations });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
+
 export async function POST(request) {
   try {
     await dbConnect();
     const data = await request.json();
-    const registration = await Registrations.create(data);
+
+    const registration = await Registrations.create({
+      ...data,
+      amountPaid: parseFloat(data.amountPaid) || 0, // Ensure it's a number
+      currency: data.currency || "INR",
+    });
+
     return NextResponse.json({ success: true, registration });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
+
+
 export async function PUT(request) {
   try {
     await dbConnect();
     const data = await request.json();
-    const registration = await Registrations.findByIdAndUpdate(data._id, data, { new: true });
+
+    const registration = await Registrations.findByIdAndUpdate(
+      data._id,
+      { ...data, amountPaid: parseFloat(data.amountPaid) || 0 }, // Ensure it's a number
+      { new: true }
+    );
+
     if (!registration) throw new Error("Registration not found");
     return NextResponse.json({ success: true, registration });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+
 
 export async function DELETE(request) {
   try {

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
 
 // Predefined options
 const titles = ["Mr.", "Mrs.", "Ms.", "Dr."];
@@ -25,6 +26,8 @@ export default function AdminRegistrationsPage() {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
   const [accompanyingText, setAccompanyingText] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
   
   // New entry states
   const [isAdding, setIsAdding] = useState(false);
@@ -42,6 +45,8 @@ export default function AdminRegistrationsPage() {
     accompanying: "No",
     numberOfAccompanying: 0, // default value added
     accompanyingPersons: [],
+    amountPaid: "",
+  currency: "INR", 
   });
   const [newAccompanyingText, setNewAccompanyingText] = useState("");
 
@@ -53,34 +58,43 @@ export default function AdminRegistrationsPage() {
     }
   }, [router]);
 
+  const handleDownloadExcel = () => {
+    const dataToExport = registrations.map(({ _id, __v, ...rest }) => rest);
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
+  XLSX.writeFile(workbook, "Registrations.xlsx");
+  };
+
   // Fetch registrations from API
-  useEffect(() => {
-    async function fetchRegistrations() {
-      try {
-        const res = await fetch("/api/registrations");
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status}`);
-        }
-        const data = await res.json();
-        if (data.success) {
-          // Sort registrations by createdAt in descending order
-          const sortedRegistrations = data.registrations.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          setRegistrations(sortedRegistrations);
-        } else {
-          throw new Error(data.error);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const fetchRegistrations = async () => {
+    try {
+      const res = await fetch("/api/registrations");
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status}`);
       }
+      const data = await res.json();
+      if (data.success) {
+        // Sort registrations by createdAt in descending order
+        const sortedRegistrations = data.registrations.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setRegistrations(sortedRegistrations);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
+  
+  // Call the function inside useEffect on component mount
+  useEffect(() => {
     fetchRegistrations();
   }, []);
-
-  console.log(registrations);
+  
   
 
   // Logout function
@@ -147,11 +161,18 @@ export default function AdminRegistrationsPage() {
   // Save updated registration data
   const handleSaveEdit = async () => {
     try {
+      const updatedData = { 
+        ...editData, 
+        amountPaid: parseFloat(editData.amountPaid) || 0, // Ensure it's a number
+        currency: editData.currency || "INR" // Ensure currency is set
+      };
+  
       const res = await fetch("/api/registrations", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
+        body: JSON.stringify(updatedData),
       });
+  
       const data = await res.json();
       if (data.success) {
         setRegistrations((prev) =>
@@ -160,11 +181,14 @@ export default function AdminRegistrationsPage() {
         setEditingId(null);
         setEditData({});
       } else {
-        toast.error("Update failed: " + data.error);      }
+        toast.error("Update failed: " + data.error);
+      }
     } catch (err) {
       toast.error("Error updating: " + err.message);
     }
   };
+  
+  
 
   // New entry handlers
   const handleNewEntryChange = (e) => {
@@ -191,15 +215,19 @@ export default function AdminRegistrationsPage() {
   
 
   const handleAddNewEntry = async () => {
-    // Parse accompanying persons from the newAccompanyingText
+    setIsSaving(true);
+  
     const names = newAccompanyingText
       .split(",")
       .map((n) => n.trim())
       .filter((n) => n.length > 0);
+  
     const updatedData = {
       ...newEntryData,
       accompanyingPersons: names.map((name) => ({ name })),
-      numberOfAccompanying: names.length, // explicitly set the count here
+      numberOfAccompanying: names.length,
+      amountPaid: parseFloat(newEntryData.amountPaid) || 0, // Ensure it's a number
+      currency: newEntryData.currency,
     };
   
     try {
@@ -208,11 +236,11 @@ export default function AdminRegistrationsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
+  
       const data = await res.json();
       if (data.success) {
-        setRegistrations((prev) => [data.registration, ...prev]);
+        await fetchRegistrations(); // ✅ Fetch all registrations again
         setIsAdding(false);
-        // Reset new entry state
         setNewEntryData({
           fullName: "",
           email: "",
@@ -227,6 +255,8 @@ export default function AdminRegistrationsPage() {
           accompanying: "No",
           numberOfAccompanying: 0,
           accompanyingPersons: [],
+          amountPaid: "",
+          currency: "INR",
         });
         setNewAccompanyingText("");
       } else {
@@ -234,8 +264,13 @@ export default function AdminRegistrationsPage() {
       }
     } catch (err) {
       alert("Error adding entry: " + err.message);
+    } finally {
+      setIsSaving(false); // Hide loader
     }
   };
+  
+  
+  
   
 
   // Filter registrations by search query (fullName, email, or phone)
@@ -259,6 +294,11 @@ export default function AdminRegistrationsPage() {
   if (error) return <div>Error: {error}</div>;
 
   return (
+    <>
+    {isSaving?  <div className="min-h-screen flex justify-center items-center">
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+      </div>
+    :
     <div className="p-4 pt-14 md:mx-auto text-[13px]">
       <div className="flex md:flex-row flex-col md:justify-between md:items-center mb-6 gap-y-4">
         <h1 className="text-3xl font-bold">Registrations</h1>
@@ -268,6 +308,12 @@ export default function AdminRegistrationsPage() {
             className="bg-green-600 text-white px-4 py-2 font-semibold rounded"
           >
             Add New Entry
+          </button>
+          <button
+            onClick={handleDownloadExcel}
+            className="bg-blue-600 text-white px-4 py-2 font-semibold rounded"
+          >
+            Download Excel
           </button>
           <button
             onClick={handleLogout}
@@ -382,6 +428,28 @@ export default function AdminRegistrationsPage() {
                 </option>
               ))}
             </select>
+            {/* Amount Paid */}
+            <input
+              type="number"
+              name="amountPaid"
+              placeholder="Amount Paid"
+              value={newEntryData.amountPaid}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            />
+
+            {/* Select Currency */}
+            <select
+              name="currency"
+              value={newEntryData.currency}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            >
+              <option value="INR">INR (₹)</option>
+              <option value="USD">USD ($)</option>
+            </select>
             {/* Payment ID */}
             <input
               type="text"
@@ -417,23 +485,36 @@ export default function AdminRegistrationsPage() {
             />
           </div>
           <div className="mt-4 flex gap-x-4">
-            <button
-              onClick={handleAddNewEntry}
-              className="bg-green-600 text-white px-4 py-2 font-semibold rounded"
-            >
-              Save New Entry
-            </button>
+          <button
+            onClick={handleAddNewEntry}
+            className="bg-green-600 text-white px-4 py-2 font-semibold rounded flex items-center"
+            disabled={isSaving} // Disable button while saving
+          >
+            {isSaving ? (
+              <span className="flex items-center">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                Saving...
+              </span>
+            ) : (
+              "Save New Entry"
+            )}
+          </button>
+
+            
             <button
               onClick={() => setIsAdding(false)}
               className="bg-gray-600 text-white px-4 py-2 font-semibold rounded"
+              disabled={isSaving} // Prevent cancel while saving
             >
               Cancel
             </button>
           </div>
+
         </div>
       )}
 
       {/* Registrations Table */}
+      <div className="overflow-x-auto">
       <table className="min-w-full table-auto border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -444,6 +525,8 @@ export default function AdminRegistrationsPage() {
             <th className="px-4 py-2 border border-gray-300">Country</th>
             <th className="px-4 py-2 border border-gray-300">Category</th>
             <th className="px-4 py-2 border border-gray-300">Event Type</th>
+            <th className="px-4 py-2 border border-gray-300">Amount Paid</th>
+            <th className="px-4 py-2 border border-gray-300">Currency</th>
             <th className="px-4 py-2 border border-gray-300">Payment ID</th>
             <th className="px-4 py-2 border border-gray-300">
               Accompanying Persons
@@ -565,6 +648,39 @@ export default function AdminRegistrationsPage() {
                   reg.eventType
                 )}
               </td>
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <input
+                    type="number"
+                    name="amountPaid"
+                    value={editData.amountPaid || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  />
+                ) : reg.amountPaid !== undefined ? (
+                  `${reg.currency === "USD" ? "$" : "₹"}${reg.amountPaid}`
+                ) : (
+                  "N/A"
+                )}
+              </td>
+
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <select
+                    name="currency"
+                    value={editData.currency || "INR"}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  >
+                    <option value="INR">INR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                  </select>
+                ) : (
+                  reg.currency || "INR"
+                )}
+              </td>
+
+
               {/* Payment ID */}
               <td className="px-4 py-2 border border-gray-300">
                 {editingId === reg._id ? (
@@ -653,6 +769,8 @@ export default function AdminRegistrationsPage() {
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </div>}
+    </>
   );
 }

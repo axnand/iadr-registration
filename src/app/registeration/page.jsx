@@ -214,7 +214,12 @@ export default function RegistrationForm() {
         toast.success("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
   
         // Submit the registration data along with the payment ID
-        const registrationData = { ...formData, paymentId: response.razorpay_payment_id };
+        const registrationData = {
+          ...formData,
+          paymentId: response.razorpay_payment_id,
+          amountPaid: amount / 100, 
+          currency,
+        };
   
         try {
           const res = await fetch("/api/registrations", {
