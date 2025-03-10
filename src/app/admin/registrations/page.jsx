@@ -63,7 +63,11 @@ export default function AdminRegistrationsPage() {
         }
         const data = await res.json();
         if (data.success) {
-          setRegistrations(data.registrations);
+          // Sort registrations by createdAt in descending order
+          const sortedRegistrations = data.registrations.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setRegistrations(sortedRegistrations);
         } else {
           throw new Error(data.error);
         }
@@ -75,6 +79,9 @@ export default function AdminRegistrationsPage() {
     }
     fetchRegistrations();
   }, []);
+
+  console.log(registrations);
+  
 
   // Logout function
   const handleLogout = () => {
@@ -237,9 +244,11 @@ export default function AdminRegistrationsPage() {
     return (
       reg.fullName.toLowerCase().includes(query) ||
       reg.email.toLowerCase().includes(query) ||
-      reg.phone.toLowerCase().includes(query)
+      reg.phone.toLowerCase().includes(query) ||
+      (reg.paymentId && reg.paymentId.toLowerCase().includes(query)) // Include payment ID
     );
   });
+  
 
   if (loading)
     return (
@@ -268,6 +277,15 @@ export default function AdminRegistrationsPage() {
           </button>
         </div>
       </div>
+      <div className="mb-4">
+  <input
+    type="text"
+    placeholder="Search by Name, Email, Phone, or Payment ID..."
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    className="border p-2 w-full md:w-1/3 rounded"
+  />
+</div>
 
       {/* New Entry Form */}
       {isAdding && (
