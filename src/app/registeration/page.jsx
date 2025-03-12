@@ -163,10 +163,11 @@ export default function RegistrationForm() {
 
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^(?:\+\d{1,3}\s)?\d{7,15}$/.test(formData.phone)) {
+    } else if (!/^\+?\d{1,3}?\d{7,15}$/.test(formData.phone)) {
       newErrors.phone =
-        "Please enter a valid international phone number (in the format +91 XXXXXXXXXX)";
+        "Please enter a valid international phone number (e.g., +91XXXXXXXXXX or +91 XXXXXXXXXX)";
     }
+    
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
