@@ -326,7 +326,7 @@ export default function RegistrationForm() {
               Thank You for Registering!
             </h1>
             <p className=" mb-8 text-center">
-              We have received your registration details. Please wait for the confirmation email.
+              We have received your registration details.
             </p>
             <a
               href="https://iadrapr2025.com"
