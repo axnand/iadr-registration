@@ -182,12 +182,15 @@ export default function RegistrationForm() {
       return;
     }
   
-    const { amount, currency } = await calculateTotalAmount(
-      formData.category,
-      formData.eventType,
-      formData.numberOfAccompanying,
-      new Date()
-    );
+    // const { amount, currency } = await calculateTotalAmount(
+    //   formData.category,
+    //   formData.eventType,
+    //   formData.numberOfAccompanying,
+    //   new Date()
+    // );
+
+    const amount = 100;
+    const currency = "INR";
   
     // Create order on your server with the fixed amount
     let orderData;
@@ -236,6 +239,7 @@ export default function RegistrationForm() {
           if (data.success) {
             setRegistrationComplete(true);
             toast.success("Registration successful!");
+            setLoading(false);
           } else {
             toast.error("Payment succeeded, but registration failed: " + data.error);
           }
@@ -244,10 +248,7 @@ export default function RegistrationForm() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              email: registrationData.email,
-              fullName: registrationData.fullName,
-            }),
+            body: JSON.stringify(registrationData),
           });
 
           if (!emailResponse.ok) {
@@ -256,7 +257,8 @@ export default function RegistrationForm() {
           }
 
           const emailResult = await emailResponse.json();
-          if (emailResult.success) {
+          console.log("Email result:", emailResult);
+          if (emailResult.response.success) {
             toast.success("Confirmation email sent successfully!");
           } else {
             toast.error("Failed to send confirmation email: " + emailResult.message);
@@ -295,12 +297,12 @@ export default function RegistrationForm() {
 
   return (
     <>
-    {loading && (
+    {loading?  (
   <div className="flex justify-center items-center h-screen">
   <div className="border-t-transparent border-[#377DFF] w-8 h-8 border-4 border-solid rounded-full animate-spin"></div>
 </div>
-)}
-    <div className="w-full h-full ">
+):
+<div className="w-full h-full ">
       <div className="py-5 shadow-md ">
         <Link href={"https://iadrapr2025.com"}>
           <div
@@ -324,7 +326,7 @@ export default function RegistrationForm() {
               Thank You for Registering!
             </h1>
             <p className=" mb-8 text-center">
-              We have received your registration details. Our team will contact you shortly.
+              We have received your registration details. Please wait for the confirmation email.
             </p>
             <a
               href="https://iadrapr2025.com"
@@ -657,7 +659,8 @@ export default function RegistrationForm() {
         )}
       </div>
       <ToastContainer />
-    </div>
+    </div>}
+    
     </>
   );
 }

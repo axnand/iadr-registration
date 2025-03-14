@@ -13,7 +13,8 @@ const GMAIL_ADDRESS = process.env.GMAIL_ADDRESS;
 const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-async function sendConfirmationEmail(recipientEmail, fullName) {
+async function sendConfirmationEmail(body) {
+    
   try {
     const accessTokenResponse = await oauth2Client.getAccessToken();
     if (accessTokenResponse.token === null) {
@@ -34,12 +35,115 @@ async function sendConfirmationEmail(recipientEmail, fullName) {
     });
 
     const mailOptions = {
-      from: `Event Team <${GMAIL_ADDRESS}>`,
-      to: recipientEmail,
-      subject: 'Registration Confirmation',
-      text: `Dear ${fullName},\n\nThank you for registering! Your payment was successful.\n\nRegards,\nEvent Team`,
-      html: `<p>Dear <b>${fullName}</b>,</p><p>Thank you for registering! Your payment was successful.</p><p>Regards,<br>Event Team</p>`,
-    };
+        from: `IADR-APR Team <${GMAIL_ADDRESS}>`,
+        to: body.email,
+        subject: 'Registration Confirmation',
+        text: `Dear ${body.fullName},
+      
+      Thank you for registering! Below are your registration details:
+      
+      Title: ${body.title}
+      Full Name: ${body.fullName}
+      Email: ${body.email}
+      Phone: ${body.phone}
+      City: ${body.city}
+      Country: ${body.country}
+      Pincode: ${body.pincode}
+      Address: ${body.address}
+      Event Type: ${body.eventType}
+      Category: ${body.category}
+      Accompanying: ${body.accompanying}
+      Number of Accompanying: ${body.numberOfAccompanying}
+      
+      If you have any questions, please contact our support team.
+      
+      Regards,
+      Event Team`,
+        html: `
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>Registration Confirmation</title>
+        </head>
+        <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f4f4;">
+          <div style="max-width:600px; margin:20px auto; background:#fff; border:1px solid #eaeaea;">
+            <!-- Header with company logo -->
+            <div style="background:#1063a5; padding:20px; text-align:center;">
+              <img src="https://iadrapr2025.com/wp-content/uploads/2025/02/logo-1.jpg" alt="Company Logo" style="max-width:150px;" />
+            </div>
+            
+            <!-- Email content -->
+            <div style="padding:20px;">
+              <h2 style="color:#333; margin-bottom:10px;">Registration Confirmation</h2>
+              <p style="color:#555;">Dear ${body.fullName},</p>
+              <p style="color:#555;">Thank you for registering! Below are the details you provided:</p>
+              
+              <table style="width:100%; border-collapse:collapse; margin-top:15px;">
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Title:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.title}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Full Name:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.fullName}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Email:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.email}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Phone:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.phone}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>City:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.city}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Country:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.country}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Pincode:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.pincode}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Address:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.address}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Event Type:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.eventType}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Category:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.category}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Accompanying:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.accompanying}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;"><strong>Number of Accompanying:</strong></td>
+                  <td style="padding:8px; border:1px solid #ddd;">${body.numberOfAccompanying}</td>
+                </tr>
+              </table>
+              
+              <p style="color:#555; margin-top:15px;">If you have any questions or need further assistance, please contact at drsmyle@yahoo.com or Phone: +91 9212098363</p>
+              <p style="color:#555;">Best regards,<br>IADR-APR Team</p>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background:#f9f9f9; padding:15px; text-align:center; font-size:12px; color:#777;">
+              <p>Company Name | Company Address, City, Country</p>
+              <p><a href="https://iadrapr2025.com" style="color:#4287f5; text-decoration:underline  ;">Visit our website</a></p>
+            </div>
+          </div>
+        </body>
+      </html>
+      `
+      };
+      
 
     const result = await transporter.sendMail(mailOptions);
     console.log('Email sent:', result);

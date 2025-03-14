@@ -3,8 +3,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
     console.log("Received confirmation request:", body);
-    const response = await sendConfirmationEmail(body.email);
-
+    const response = await sendConfirmationEmail(body);
     return new Response(
       JSON.stringify({ message: "Confirmation email sent", response }),
       { status: 200, headers: { "Content-Type": "application/json" } }
