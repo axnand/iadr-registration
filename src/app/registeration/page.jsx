@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 // ------------------ Actual Registration Form ------------------ //
 
-const titles = ["Mr.", "Mrs.", "Ms.", "Dr."];
+const titles = ["Mr.", "Mrs.", "Ms.", "Dr.","Prof."];
 const iadrCategories = [
   "ISDR Member",
   "Non-Member (Delegate)",
@@ -54,6 +54,8 @@ export default function RegistrationForm() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [errors, setErrors] = useState({});
   const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   // Recalculate total based on pricing logic
   useEffect(() => {
@@ -211,8 +213,10 @@ export default function RegistrationForm() {
       name: "Event Registration",
       description: "Payment for event registration",
       handler: async function (response) {
-        console.log("Payment successful:", response);
         toast.success("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
+        toast.success("Wait for the Confirmation Mail")
+
+        setLoading(true);
   
         // Submit the registration data along with the payment ID
         const registrationData = {
@@ -234,6 +238,28 @@ export default function RegistrationForm() {
             toast.success("Registration successful!");
           } else {
             toast.error("Payment succeeded, but registration failed: " + data.error);
+          }
+          const emailResponse = await fetch("/api/send-confirmation", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: registrationData.email,
+              fullName: registrationData.fullName,
+            }),
+          });
+
+          if (!emailResponse.ok) {
+            const emailError = await emailResponse.json();
+            throw new Error(emailError.message || "Failed to send confirmation email");
+          }
+
+          const emailResult = await emailResponse.json();
+          if (emailResult.success) {
+            toast.success("Confirmation email sent successfully!");
+          } else {
+            toast.error("Failed to send confirmation email: " + emailResult.message);
           }
         } catch (error) {
           console.error("Error submitting registration:", error);
@@ -268,6 +294,12 @@ export default function RegistrationForm() {
   };
 
   return (
+    <>
+    {loading && (
+  <div className="flex justify-center items-center h-screen">
+  <div className="border-t-transparent border-[#377DFF] w-8 h-8 border-4 border-solid rounded-full animate-spin"></div>
+</div>
+)}
     <div className="w-full h-full ">
       <div className="py-5 shadow-md ">
         <Link href={"https://iadrapr2025.com"}>
@@ -626,5 +658,6 @@ export default function RegistrationForm() {
       </div>
       <ToastContainer />
     </div>
+    </>
   );
 }
