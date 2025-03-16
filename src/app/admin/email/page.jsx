@@ -10,7 +10,6 @@ const eventTypeCategories = {
     "International Delegate",
     "International Delegate (Asia Pacific)",
     "Indian Delegate",
-    "Accompanying Person",
     "UG Students",
   ],
   "IADR-APR": [
@@ -18,7 +17,6 @@ const eventTypeCategories = {
     "Non-Member (Delegate)",
     "Student (ISDR Member)",
     "Student (Non-Member)",
-    "Accompanying Person (Non-Dentist)",
     "International Delegate (IADR Member)",
     "International Delegate (Non-IADR Member)",
   ],
@@ -26,7 +24,6 @@ const eventTypeCategories = {
     "International Delegate",
     "International Delegate (Asia Pacific)",
     "Indian Delegate",
-    "Accompanying Person",
     "UG Students",
   ],
 };
