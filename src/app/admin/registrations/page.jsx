@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
+import Link from "next/link";
 
 // Predefined options
 const titles = ["Mr.", "Mrs.", "Ms.", "Dr."];
@@ -315,12 +316,11 @@ export default function AdminRegistrationsPage() {
           >
             Download Excel
           </button>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 text-white px-4 py-2 font-semibold rounded"
-          >
-            Logout
-          </button>
+          <Link href="/admin/email">
+            <button className="bg-red-600 text-white px-4 py-2 font-semibold rounded hover:bg-red-700 transition">
+              Send Email
+            </button>
+          </Link>
         </div>
       </div>
       <div className="mb-4">
