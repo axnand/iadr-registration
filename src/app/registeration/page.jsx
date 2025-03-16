@@ -505,7 +505,7 @@ export default function RegistrationForm() {
                     htmlFor="country"
                     className="block text-gray-700 font-medium pb-2 text-sm"
                   >
-                    Country
+                    Nationality
                   </label>
                   <input
                     id="country"

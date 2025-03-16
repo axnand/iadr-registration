@@ -522,7 +522,7 @@ export default function AdminRegistrationsPage() {
             <th className="px-4 py-2 border border-gray-300">Email</th>
             <th className="px-4 py-2 border border-gray-300">Phone</th>
             <th className="px-4 py-2 border border-gray-300">City</th>
-            <th className="px-4 py-2 border border-gray-300">Country</th>
+            <th className="px-4 py-2 border border-gray-300">Nationality</th>
             <th className="px-4 py-2 border border-gray-300">Pincode</th>
             <th className="px-4 py-2 border border-gray-300">Address</th>
             <th className="px-4 py-2 border border-gray-300">Category</th>
