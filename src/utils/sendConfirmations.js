@@ -77,7 +77,10 @@ async function sendConfirmationEmail(body) {
               <h2 style="color:#333; margin-bottom:10px;">Registration Confirmation</h2>
               <p style="color:#555;">Dear ${body.fullName},</p>
               <p style="color:#555;">Thank you for registering! Below are the details you provided:</p>
-              
+              <p style="color:#d9534f; font-weight:bold; font-size:16px; margin-top:10px; background-color:#f8d7da; padding:10px; border-radius:5px; text-align:center;">
+                🚨 Note: Your Phone Number with Country Code <span style="text-decoration:underline;">${body.phone}</span> 
+                (without the '+' symbol) is your unique <strong>Registration ID</strong> for the event.
+              </p>
               <table style="width:100%; border-collapse:collapse; margin-top:15px;">
                 <tr>
                   <td style="padding:8px; border:1px solid #ddd;"><strong>Title:</strong></td>

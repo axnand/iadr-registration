@@ -182,15 +182,15 @@ export default function RegistrationForm() {
       return;
     }
   
-    // const { amount, currency } = await calculateTotalAmount(
-    //   formData.category,
-    //   formData.eventType,
-    //   formData.numberOfAccompanying,
-    //   new Date()
-    // );
+    const { amount, currency } = await calculateTotalAmount(
+      formData.category,
+      formData.eventType,
+      formData.numberOfAccompanying,
+      new Date()
+    );
 
-    const amount = 100;
-    const currency = "INR";
+    // const amount = 100;
+    // const currency = "INR";
   
     // Create order on your server with the fixed amount
     let orderData;
