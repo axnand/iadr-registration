@@ -182,15 +182,15 @@ export default function RegistrationForm() {
       return;
     }
   
-    const { amount, currency } = await calculateTotalAmount(
-      formData.category,
-      formData.eventType,
-      formData.numberOfAccompanying,
-      new Date()
-    );
+    // const { amount, currency } = await calculateTotalAmount(
+    //   formData.category,
+    //   formData.eventType,
+    //   formData.numberOfAccompanying,
+    //   new Date()
+    // );
 
-    // const amount = 100;
-    // const currency = "INR";
+    const amount = 100;
+    const currency = "INR";
   
     // Create order on your server with the fixed amount
     let orderData;
@@ -243,26 +243,26 @@ export default function RegistrationForm() {
           } else {
             toast.error("Payment succeeded, but registration failed: " + data.error);
           }
-          // const emailResponse = await fetch("/api/send-confirmation", {
-          //   method: "POST",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //   },
-          //   body: JSON.stringify(registrationData),
-          // });
+          const emailResponse = await fetch("/api/send-confirmation", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(registrationData),
+          });
 
-          // if (!emailResponse.ok) {
-          //   const emailError = await emailResponse.json();
-          //   throw new Error(emailError.message || "Failed to send confirmation email");
-          // }
+          if (!emailResponse.ok) {
+            const emailError = await emailResponse.json();
+            throw new Error(emailError.message || "Failed to send confirmation email");
+          }
 
-          // const emailResult = await emailResponse.json();
-          // console.log("Email result:", emailResult);
-          // if (emailResult.response.success) {
-          //   toast.success("Confirmation email sent successfully!");
-          // } else {
-          //   toast.error("Failed to send confirmation email: " + emailResult.message);
-          // }
+          const emailResult = await emailResponse.json();
+          console.log("Email result:", emailResult);
+          if (emailResult.response.success) {
+            toast.success("Confirmation email sent successfully!");
+          } else {
+            toast.error("Failed to send confirmation email: " + emailResult.message);
+          }
         } catch (error) {
           console.error("Error submitting registration:", error);
           toast.error("Payment succeeded, but registration submission encountered an error.");
@@ -326,7 +326,7 @@ export default function RegistrationForm() {
               Thank You for Registering!
             </h1>
             <p className=" mb-8 text-center">
-              We have received your registration details.
+              We have received your registration details. Kindly check for the confirmation mail.
             </p>
             <a
               href="https://iadrapr2025.com"
