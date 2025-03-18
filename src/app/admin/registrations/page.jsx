@@ -324,6 +324,9 @@ export default function AdminRegistrationsPage() {
           </Link>
         </div>
       </div>
+      <div className="my-2 pb-4 text-sm font-semibold ">
+        <p>Showing Registrations: {filteredRegistrations.length} out of {registrations.length}</p>
+      </div>
       <div className="mb-4">
   <input
     type="text"
