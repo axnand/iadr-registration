@@ -281,7 +281,8 @@ export default function AdminRegistrationsPage() {
       reg.fullName.toLowerCase().includes(query) ||
       reg.email.toLowerCase().includes(query) ||
       reg.phone.toLowerCase().includes(query) ||
-      (reg.paymentId && reg.paymentId.toLowerCase().includes(query)) // Include payment ID
+      (reg.paymentId && reg.paymentId.toLowerCase().includes(query))||
+      reg.paymentMode.toLowerCase().includes(query) // Include payment ID
     );
   });
   
@@ -450,6 +451,17 @@ export default function AdminRegistrationsPage() {
               <option value="INR">INR (₹)</option>
               <option value="USD">USD ($)</option>
             </select>
+
+            <select
+              name="paymentMode"
+              value={newEntryData.paymentMode}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+              required
+            >
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
             {/* Payment ID */}
             <input
               type="text"
@@ -529,6 +541,7 @@ export default function AdminRegistrationsPage() {
             <th className="px-4 py-2 border border-gray-300">Event Type</th>
             <th className="px-4 py-2 border border-gray-300">Amount Paid</th>
             <th className="px-4 py-2 border border-gray-300">Currency</th>
+            <th className="px-4 py-2 border border-gray-300">Payment Mode</th>
             <th className="px-4 py-2 border border-gray-300">Payment ID</th>
             <th className="px-4 py-2 border border-gray-300">
               Accompanying Persons
@@ -708,6 +721,21 @@ export default function AdminRegistrationsPage() {
                 )}
               </td>
 
+              <td className="px-4 py-2 border border-gray-300">
+                {editingId === reg._id ? (
+                  <select
+                    name="paymentMode"
+                    value={editData.paymentMode || ""}
+                    onChange={handleEditChange}
+                    className="border p-1"
+                  >
+                    <option value="online">Online</option>
+                    <option value="offline">Offline</option>
+                  </select>
+                ) : (
+                  reg.paymentMode || "N/A"
+                )}
+              </td>
 
               {/* Payment ID */}
               <td className="px-4 py-2 border border-gray-300">
