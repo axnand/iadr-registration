@@ -13,7 +13,7 @@ const GMAIL_ADDRESS = process.env.GMAIL_ADDRESS;
 const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-async function sendConfirmationEmail(body) {
+export default async function sendConfirmationEmail(body) {
     
   try {
     const accessTokenResponse = await oauth2Client.getAccessToken();
@@ -33,6 +33,16 @@ async function sendConfirmationEmail(body) {
         accessToken: accessToken,
       },
     });
+
+
+    const amountText = body.paymentMode === "offline" ? `\nAmount: ${body.amount}` : "";
+    const amountHTML = body.paymentMode === "offline" 
+      ? `<tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>Amount:</strong></td>
+          <td style="padding:8px; border:1px solid #ddd;">${body.amount}</td>
+        </tr>` 
+      : "";
+
 
     const mailOptions = {
         from: `IADR-APR Team <${GMAIL_ADDRESS}>`,
@@ -54,6 +64,7 @@ async function sendConfirmationEmail(body) {
       Category: ${body.category}
       Accompanying: ${body.accompanying}
       Number of Accompanying: ${body.numberOfAccompanying}
+
       
       If you have any questions, please contact our support team.
       
@@ -120,6 +131,7 @@ async function sendConfirmationEmail(body) {
                   <td style="padding:8px; border:1px solid #ddd;"><strong>Category:</strong></td>
                   <td style="padding:8px; border:1px solid #ddd;">${body.category}</td>
                 </tr>
+                ${amountHTML}
                 <tr>
                   <td style="padding:8px; border:1px solid #ddd;"><strong>Accompanying:</strong></td>
                   <td style="padding:8px; border:1px solid #ddd;">${body.accompanying}</td>

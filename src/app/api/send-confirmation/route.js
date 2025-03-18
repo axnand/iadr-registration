@@ -1,4 +1,4 @@
-import sendConfirmationEmail from "@/utils/sendConfirmations";
+import sendConfirmationEmail from "@/utils/sendConfirmations.js";
 export async function POST(req) {
   try {
     const body = await req.json();

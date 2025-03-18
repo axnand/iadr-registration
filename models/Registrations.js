@@ -20,7 +20,7 @@ const RegistrationSchema = new mongoose.Schema({
   amountPaid: { type: Number, required: true },
   currency: { type: String, default: "INR" },
   paymentId: { type: String },
-  paymentMode: { type: String, enum: ["offline", "online"] },
+  paymentMode: { type: String, enum: ["offline", "online"], default: "online" },
   createdAt: { type: Date, default: Date.now },
 });
 

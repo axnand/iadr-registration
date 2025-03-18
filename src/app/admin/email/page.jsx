@@ -40,6 +40,8 @@ export default function SendEmailPage() {
     address: "",
     eventType: "",
     category: "",
+    paymentMode: "",
+    amount: "",
     accompanying: "",
     numberOfAccompanying: "",
   });
@@ -56,6 +58,7 @@ export default function SendEmailPage() {
   const handleSendEmail = async () => {
     setLoading(true);
     setMessage("");
+    
 
     try {
       const response = await fetch("/api/send-confirmation", {
@@ -167,6 +170,21 @@ export default function SendEmailPage() {
             </select>
           </div>
 
+          <div>
+            <label className="block text-[13px] font-medium text-gray-700">Payment Mode</label>
+            <select name="paymentMode" value={formData.paymentMode} onChange={handleChange}
+              className="w-full p-2 border rounded focus:ring focus:ring-blue-200">
+              <option value="">Select Category</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-gray-700">Amount</label>
+            <input type="text" name="amount" value={formData.amount} onChange={handleChange}
+              className="w-full p-2 border rounded focus:ring focus:ring-blue-200" />
+          </div>
+
           {/* 🔹 Accompanying */}
           
 
@@ -187,7 +205,7 @@ export default function SendEmailPage() {
 
         {/* 🔹 Submit Button */}
         <button onClick={handleSendEmail} disabled={loading}
-          className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+          className={`mt-4 w-full py-2 rounded text-white ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}>
           {loading ? "Sending..." : "Send Email"}
         </button>
 
