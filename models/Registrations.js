@@ -1,4 +1,3 @@
-// models/Registration.js
 import mongoose from "mongoose";
 
 const RegistrationSchema = new mongoose.Schema({
@@ -13,7 +12,6 @@ const RegistrationSchema = new mongoose.Schema({
   eventType: { type: String, required: true },
   accompanying: { type: String, required: true },
   numberOfAccompanying: { type: Number, required: true },
-  // New field to store details of accompanying persons
   accompanyingPersons: [
     {
       name: { type: String, required: true },
@@ -22,6 +20,7 @@ const RegistrationSchema = new mongoose.Schema({
   amountPaid: { type: Number, required: true },
   currency: { type: String, default: "INR" },
   paymentId: { type: String },
+  paymentMode: { type: String, enum: ["offline", "online"] },
   createdAt: { type: Date, default: Date.now },
 });
 
