@@ -58,7 +58,7 @@ const accompanyingPersonPricing = {
 };
 
 function getPricingTier(currentDate) {
-  const earlyBirdEndDate = new Date("2025-03-31");
+  const earlyBirdEndDate = new Date("2025-04-30");
   const standardEndDate = new Date("2025-06-30");
 
   if (currentDate <= earlyBirdEndDate) return "earlyBird";
