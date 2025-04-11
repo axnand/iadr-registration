@@ -55,6 +55,7 @@ const accompanyingPersonPricing = {
   "Combo (WWW9 & IADR-APR)": {
     "Accompanying Person": { amount: 23000, currency: "INR" }
   }
+  
 };
 
 function getPricingTier(currentDate) {
