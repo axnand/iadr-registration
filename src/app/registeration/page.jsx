@@ -152,25 +152,43 @@ export default function RegistrationForm() {
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.fullName.trim()) {
+    const isEmpty = (field) => {
+      return !field || (typeof field === 'string' && field.trim() === '');
+    };
+  
+    if (isEmpty(formData.fullName)) {
       newErrors.fullName = "Full name is required";
     }
-
-    if (!formData.email.trim()) {
+  
+    if (isEmpty(formData.email)) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid";
     }
-
-    if (!formData.phone.trim()) {
+  
+    if (isEmpty(formData.phone)) {
       newErrors.phone = "Phone number is required";
     } else if (!/^\+?\d{1,3}?\d{7,15}$/.test(formData.phone)) {
       newErrors.phone =
-        "Please enter a valid international phone number (e.g., +91XXXXXXXXXX or +91 XXXXXXXXXX)";
+        "Please enter a valid international phone number (e.g., +91XXXXXXXXXX or +1 5555555555)";
     }
-    
-
+  
+    if (isEmpty(formData.pincode)) {
+      newErrors.pincode = "Pincode is required";
+    }
+  
+    if (isEmpty(formData.city)) {
+      newErrors.city = "City is required";
+    }
+  
+    if (isEmpty(formData.country)) {
+      newErrors.country = "Nationality is required";
+    }
+  
+    if (isEmpty(formData.address)) {
+      newErrors.address = "Address is required";
+    }
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -499,6 +517,10 @@ export default function RegistrationForm() {
                     className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                     required
                   />
+                  {errors.city && (
+                    <p className="text-red-500 text-xs">{errors.city}</p>
+                  )}
+
                 </div>
                 <div>
                   <label
@@ -514,6 +536,9 @@ export default function RegistrationForm() {
                     className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                     required
                   />
+                  {errors.country && (
+                    <p className="text-red-500 text-xs">{errors.country}</p>
+                  )}
                 </div>
               </div>
 
@@ -533,6 +558,9 @@ export default function RegistrationForm() {
                   className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                   required
                 />
+                {errors.pincode && (
+                    <p className="text-red-500 text-xs">{errors.pincode}</p>
+                  )}
               </div>
 
               {/* Row 5: Address */}
@@ -550,6 +578,9 @@ export default function RegistrationForm() {
                   className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
                   required
                 />
+                {errors.address && (
+                    <p className="text-red-500 text-xs">{errors.address}</p>
+                  )}
               </div>
 
               {/* Row 9: Accompanying Option */}
