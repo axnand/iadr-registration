@@ -475,7 +475,7 @@ export default function AccommodationForm() {
                     <input
                       id="phone"
                       name="phone"
-                      placeholder="+91 999999999 or +1 5555555555"
+                      placeholder="+91999999999 or +15555555555"
                       type="tel"
                       onChange={handleInputChange}
                       className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
