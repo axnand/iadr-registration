@@ -8,7 +8,7 @@ import Link from "next/link";
 // Predefined options
 const titles = ["Mr.", "Mrs.", "Ms.", "Dr."];
 const delegateTypes = ["Indian Delegate", "International Delegate"];
-const roomTypes = ["Twin Sharing", "Single Occupancy"];
+const roomTypes = ["Single Occupancy","Twin Sharing"];
 const paymentModes = ["online", "offline"];
 
 export default function AdminAccommodationsPage() {
@@ -20,7 +20,6 @@ export default function AdminAccommodationsPage() {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
   const [isSaving, setIsSaving] = useState(false);
-
   // New entry states
   const [isAdding, setIsAdding] = useState(false);
   const [newEntryData, setNewEntryData] = useState({
@@ -34,9 +33,9 @@ export default function AdminAccommodationsPage() {
     address: "",
     delegateType: delegateTypes[0],
     roomType: roomTypes[0],
+    twinSharingDelegateName: "",
     checkInDate: "",
     checkOutDate: "",
-    specialRequests: "",
     amountPaid: "",
     currency: "INR",
     paymentId: "",
@@ -206,9 +205,9 @@ export default function AdminAccommodationsPage() {
           address: "",
           delegateType: delegateTypes[0],
           roomType: roomTypes[0],
+          twinSharingDelegateName: "",
           checkInDate: "",
           checkOutDate: "",
-          specialRequests: "",
           amountPaid: "",
           currency: "INR",
           paymentId: "",
@@ -394,6 +393,14 @@ export default function AdminAccommodationsPage() {
                 </option>
               ))}
             </select>
+            <input
+              type="text"
+              name="twinSharingDelegateName"
+              placeholder="Twin Sharing Delegate Name"
+              value={newEntryData.twinSharingDelegateName}
+              onChange={handleNewEntryChange}
+              className="border p-2"
+            />
             {/* Check-in Date */}
             <div>
               <label className="block text-sm mb-1">Check-in Date</label>
@@ -418,14 +425,6 @@ export default function AdminAccommodationsPage() {
                 required
               />
             </div>
-            {/* Special Requests */}
-            <textarea
-              name="specialRequests"
-              placeholder="Special Requests"
-              value={newEntryData.specialRequests}
-              onChange={handleNewEntryChange}
-              className="border p-2"
-            />
             {/* Amount Paid */}
             <input
               type="number"
@@ -512,9 +511,9 @@ export default function AdminAccommodationsPage() {
               <th className="px-4 py-2 border border-gray-300">Address</th>
               <th className="px-4 py-2 border border-gray-300">Delegate Type</th>
               <th className="px-4 py-2 border border-gray-300">Room Type</th>
+              <th className="px-4 py-2 border border-gray-300">Twin Sharing Delegate</th>
               <th className="px-4 py-2 border border-gray-300">Check-in Date</th>
               <th className="px-4 py-2 border border-gray-300">Check-out Date</th>
-              <th className="px-4 py-2 border border-gray-300">Special Requests</th>
               <th className="px-4 py-2 border border-gray-300">Amount Paid</th>
               <th className="px-4 py-2 border border-gray-300">Currency</th>
               <th className="px-4 py-2 border border-gray-300">Payment Mode</th>
@@ -678,8 +677,22 @@ export default function AdminAccommodationsPage() {
                         </option>
                       ))}
                     </select>
+                    
                   ) : (
                     acc.roomType
+                  )}
+                </td>
+                <td className="px-4 py-2 border border-gray-300">
+                  {editingId === acc._id ? (
+                    <input
+                      type="text"
+                      name="twinSharingDelegateName"
+                      value={editData.twinSharingDelegateName || ""}
+                      onChange={handleEditChange}
+                      className="border p-1"
+                    />
+                  ) : (
+                    acc.twinSharingDelegateName || "N/A"
                   )}
                 </td>
                 {/* Check-in Date */}
@@ -708,19 +721,6 @@ export default function AdminAccommodationsPage() {
                     />
                   ) : (
                     new Date(acc.checkOutDate).toLocaleDateString()
-                  )}
-                </td>
-                {/* Special Requests */}
-                <td className="px-4 py-2 border border-gray-300">
-                  {editingId === acc._id ? (
-                    <textarea
-                      name="specialRequests"
-                      value={editData.specialRequests || ""}
-                      onChange={handleEditChange}
-                      className="border p-1"
-                    />
-                  ) : (
-                    acc.specialRequests || "N/A"
                   )}
                 </td>
                 {/* Amount Paid */}

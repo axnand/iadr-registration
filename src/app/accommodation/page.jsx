@@ -65,10 +65,10 @@ export default function AccommodationForm() {
     pincode: "",
     address: "",
     delegateType: "Indian Delegate",
-    roomType: "Twin Sharing",
+    roomType: "Single Occupancy",
+    twinSharingDelegateName: "",
     checkInDate: "",
     checkOutDate: "",
-    specialRequests: "",
   });
   const [totalAmount, setTotalAmount] = useState({ amount: 0, currency: "INR", numberOfDays: 0 });
   const [errors, setErrors] = useState({});
@@ -227,6 +227,7 @@ export default function AccommodationForm() {
           amountPaid: amount / 100, 
           currency,
           numberOfDays: totalAmount.numberOfDays,
+          twinSharingDelegateName: formData.twinSharingDelegateName,
           registrationType: "Accommodation", // Add identifier for accommodation
         };
   
@@ -398,6 +399,28 @@ export default function AccommodationForm() {
                       </option>
                     ))}
                   </select>
+                  {formData.roomType === "Twin Sharing" && (
+                    <div className="mt-4">
+                      <label
+                        htmlFor="twinSharingDelegateName"
+                        className="block text-gray-700 font-medium pb-2 text-sm"
+                      >
+                        Twin Sharing Delegate Name (Optional)
+                      </label>
+                      <input
+                        id="twinSharingDelegateName"
+                        name="twinSharingDelegateName"
+                        value={formData.twinSharingDelegateName}
+                        onChange={handleInputChange}
+                        className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        placeholder="Enter delegate name if you have made mutual arrangements"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Please add name of delegate if you have made mutual arrangements with another delegate. 
+                        Otherwise, you will be matched with the best possible option available.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Row: Title & Full Name */}
@@ -612,22 +635,7 @@ export default function AccommodationForm() {
                   </div>
                 </div>
 
-                {/* Row: Special Requests */}
-                <div className="text-[13px]">
-                  <label
-                    htmlFor="specialRequests"
-                    className="block text-gray-700 font-medium pb-2 text-sm"
-                  >
-                    Special Requests (Optional)
-                  </label>
-                  <textarea
-                    id="specialRequests"
-                    name="specialRequests"
-                    onChange={handleInputChange}
-                    className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-400"
-                    placeholder="Any special requirements or requests"
-                  />
-                </div>
+                
 
                 {/* Row: Total Amount */}
                 <div className="text-[13px]">
