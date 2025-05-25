@@ -28,7 +28,7 @@ const iadrAprPricing = {
 };
 
 const eventTypePricing = {
-  "WWW9 Meeting": {
+  "ww9 Meeting": {
     "International Delegate": { amount: 275, currency: "USD" },
     "International Delegate (Asia Pacific)": { amount: 250, currency: "USD" },
     "Indian Delegate": { amount: 11000, currency: "INR" },
@@ -36,7 +36,7 @@ const eventTypePricing = {
     "UG Students": { amount: 6000, currency: "INR" },
   },
 
-  "Combo (WWW9 & IADR-APR)": {
+  "Combo (ww9 & IADR-APR)": {
     "International Delegate": { amount: 625, currency: "USD" },
     "International Delegate (Asia Pacific)": { amount: 625, currency: "USD" },
     "Indian Delegate": { amount: 23000, currency: "INR" },
@@ -46,13 +46,13 @@ const eventTypePricing = {
 };
 
 const accompanyingPersonPricing = {
-  "WWW9 Meeting": {
+  "ww9 Meeting": {
     "Accompanying Person": { amount: 11000, currency: "INR" }
   },
   "IADR-APR": {
     "Accompanying Person (Non-Dentist)": { earlyBird: 15340, standard: 17700, late: 17700, currency: "INR" }
   },
-  "Combo (WWW9 & IADR-APR)": {
+  "Combo (ww9 & IADR-APR)": {
     "Accompanying Person": { amount: 23000, currency: "INR" }
   }
   

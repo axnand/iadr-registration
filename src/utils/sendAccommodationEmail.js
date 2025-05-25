@@ -124,16 +124,14 @@ IADR APR 2025 Organizing Committee`,
                   <td style="padding:8px; border:1px solid #ddd;">${body.currency === 'INR' ? '₹' : '$'}${body.amountPaid}</td>
                 </tr>
               </table>
+           <p style="color:#555; margin-top:15px;">If you have any questions or need further assistance, please contact at drsmyle@yahoo.com or Phone: +91 9212098363</p>
+              <p style="color:#555;">Best regards,<br>IADR-APR Team</p>
             </div>
             
-            <p>If you have any questions or need to make changes to your booking, please contact our support team at <a href="mailto:support@iadrapr2025.com">support@iadrapr2025.com</a>.</p>
-            
-            <p>We look forward to welcoming you to Hotel Leela.</p>
-            
-            <p>Best regards,<br />IADR APR 2025 Organizing Committee</p>
-            
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #6b7280;">
-              <p>This is an automated message. Please do not reply to this email.</p>
+            <!-- Footer -->
+            <div style="background:#f9f9f9; padding:15px; text-align:center; font-size:12px; color:#777;">
+              <p>Company Name | Company Address, City, Country</p>
+              <p><a href="https://iadrapr2025.com" style="color:#4287f5; text-decoration:underline  ;">Visit our website</a></p>
             </div>
           </div>
         `

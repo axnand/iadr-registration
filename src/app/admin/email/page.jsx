@@ -6,7 +6,7 @@ const titles = ["Dr.", "Prof.", "Mr.", "Ms.", "Mrs."];
 
 // 🔹 Event Types & Categories
 const eventTypeCategories = {
-  "WWW9 Meeting": [
+  "ww9 Meeting": [
     "International Delegate",
     "International Delegate (Asia Pacific)",
     "Indian Delegate",
@@ -20,7 +20,7 @@ const eventTypeCategories = {
     "International Delegate (IADR Member)",
     "International Delegate (Non-IADR Member)",
   ],
-  "Combo (WWW9 & IADR-APR)": [
+  "Combo (ww9 & IADR-APR)": [
     "International Delegate",
     "International Delegate (Asia Pacific)",
     "Indian Delegate",
