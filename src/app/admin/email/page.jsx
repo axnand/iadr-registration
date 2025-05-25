@@ -19,6 +19,7 @@ const eventTypeCategories = {
     "Student (Non-Member)",
     "International Delegate (IADR Member)",
     "International Delegate (Non-IADR Member)",
+    "Domestic Student Presenting Paper",
   ],
   "Combo (WW9 & IADR-APR)": [
     "International Delegate",

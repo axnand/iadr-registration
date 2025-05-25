@@ -25,6 +25,7 @@ const iadrAprPricing = {
   "Accompanying Person (Non-Dentist)": { earlyBird: 15340, standard: 17700, late: 17700, currency: "INR" },
   "International Delegate (IADR Member)": { earlyBird: 400, standard: 450, late: 500, currency: "USD" },
   "International Delegate (Non-IADR Member)": { earlyBird: 500, standard: 600, late: 700, currency: "USD" },
+  "Domestic Student Presenting Paper": { earlyBird: 10620 , standard: 10620 , late: 10620 , currency: "INR" },
 };
 
 const eventTypePricing = {

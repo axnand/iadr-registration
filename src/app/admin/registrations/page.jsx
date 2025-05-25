@@ -14,6 +14,7 @@ const categories = [
   "Student: UG/PG/PhD (Non-Member)",
   "International Delegate (IADR Member)",
   "International Delegate (Non-IADR Member)",
+  "Domestic Student Presenting Paper",
 ];
 const eventTypes = ["WW9 Meeting", "IADR-APR", "Combo (WW9 & IADR-APR)", "None"];
 const accompanyingOptions = ["No", "Yes"];
