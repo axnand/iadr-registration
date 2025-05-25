@@ -19,7 +19,7 @@ const iadrCategories = [
   "International Delegate (Non-IADR Member)",
 ];
 
-const ww9ComboCategories = [
+const WW9ComboCategories = [
   "International Delegate",
   "International Delegate (Asia Pacific)",
   "Indian Delegate",
@@ -28,8 +28,8 @@ const ww9ComboCategories = [
 
 const eventTypes = [
   "IADR-APR",
-  "ww9 Meeting",
-  "Combo (ww9 & IADR-APR)",
+  "WW9 Meeting",
+  "Combo (WW9 & IADR-APR)",
 ];
 
 const accompanyingOptions = ["No", "Yes"];
@@ -99,7 +99,7 @@ export default function RegistrationForm() {
       setFormData((prev) => ({
         ...prev,
         eventType: value,
-        category: value === "IADR-APR" ? iadrCategories[0] : ww9ComboCategories[0],
+        category: value === "IADR-APR" ? iadrCategories[0] : WW9ComboCategories[0],
       }));
     } else {
       setFormData((prev) => ({
@@ -380,7 +380,7 @@ export default function RegistrationForm() {
                           {cat}
                         </option>
                       ))
-                    : ww9ComboCategories.map((cat) => (
+                    : WW9ComboCategories.map((cat) => (
                         <option key={cat} value={cat}>
                           {cat}
                         </option>

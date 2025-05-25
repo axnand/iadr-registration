@@ -15,7 +15,7 @@ const categories = [
   "International Delegate (IADR Member)",
   "International Delegate (Non-IADR Member)",
 ];
-const eventTypes = ["ww9 Meeting", "IADR-APR", "Combo (ww9 & IADR-APR)", "None"];
+const eventTypes = ["WW9 Meeting", "IADR-APR", "Combo (WW9 & IADR-APR)", "None"];
 const accompanyingOptions = ["No", "Yes"];
 
 export default function AdminRegistrationsPage() {
