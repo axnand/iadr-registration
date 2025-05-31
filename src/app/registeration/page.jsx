@@ -671,8 +671,7 @@ export default function RegistrationForm() {
               <div className="text-[13px] text-gray-500">
                 <h3 className="font-semibold">Cancellation Policy:</h3>
                 <p>
-                  Refund will be provided with written notification against the original
-                  registration receipt only if applied before 15 July 2025.
+                  Refund will be provided with written notification against original registration receipt only if applied before 15 July 2025. Deduction of Bank, GST and other taxes shall be applicable. 
                 </p>
                 <p>Post 15 July 2025, no refund will be made.</p>
               </div>
