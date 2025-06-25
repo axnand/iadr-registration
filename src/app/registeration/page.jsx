@@ -21,16 +21,13 @@ const iadrCategories = [
 ];
 
 const WW9ComboCategories = [
-  "International Delegate",
-  "International Delegate (Asia Pacific)",
-  "Indian Delegate",
-  "UG Students",
+  "Indian IADR APR delegate",
+  "International IADR APR delegate",
 ];
 
 const eventTypes = [
   "IADR-APR",
   "WW9 Meeting",
-  "Combo (WW9 & IADR-APR)",
 ];
 
 const accompanyingOptions = ["No", "Yes"];
@@ -74,9 +71,12 @@ export default function RegistrationForm() {
       );
 
       setTotalAmount(calculatedTotal);
+      console.log(calculatedTotal);
     }
     updateTotal();
   }, [formData.category, formData.eventType, formData.numberOfAccompanying]);
+
+  
 
   // Load Razorpay script once
   useEffect(() => {
@@ -585,7 +585,7 @@ export default function RegistrationForm() {
               </div>
 
               {/* Row 9: Accompanying Option */}
-              <div className="text-[13px]">
+              {formData.eventType == "IADR-APR" && <div className="text-[13px]">
                 <label
                   htmlFor="accompanying"
                   className="block text-gray-700 font-medium pb-2 text-sm"
@@ -605,7 +605,7 @@ export default function RegistrationForm() {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div>}
 
               {/* Row 10: Number of Accompanying Persons */}
               {formData.accompanying === "Yes" && (
@@ -659,11 +659,25 @@ export default function RegistrationForm() {
                   Total Amount Payable
                 </label>
                 <div className="text-2xl font-bold">
-                  {totalAmount?.amount > 0
-                    ? totalAmount.currency === "INR"
-                      ? `₹${(totalAmount.amount / 100).toFixed(2)}`
-                      : `$${(totalAmount.amount / 100).toFixed(2)}`
-                    : "Select a valid category & event"}
+                  {totalAmount?.amount > 0 ? (
+                    <div>
+                      <span>
+                        {totalAmount.currency === "INR" 
+                          ? `₹${(totalAmount.amount / 100).toFixed(2)}`
+                          : `$${(totalAmount.amount / 100).toFixed(2)}`
+                        }
+                      </span>
+                      {totalAmount?  
+                        <div className="text-sm text-gray-500 font-normal mt-1">
+                          Base Fee: <span className=" font-medium">{totalAmount.baseFee}</span> + 
+                          Convenience Fee: <span className=" font-medium">{totalAmount.convenienceFee}</span>
+                        </div>
+                        :<></>
+                      }
+                    </div>
+                  ) : (
+                    "Select a valid category & event"
+                  )}
                 </div>
               </div>
 
