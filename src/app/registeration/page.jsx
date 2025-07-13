@@ -27,7 +27,6 @@ const WW9ComboCategories = [
 
 const eventTypes = [
   "IADR-APR",
-  "WW9 Meeting",
 ];
 
 const accompanyingOptions = ["No", "Yes"];
