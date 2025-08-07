@@ -20,8 +20,7 @@ async function getUsdToInrRate() {
 const validCoupons = {
   "IADR2025": {
     applicableCategories: [
-      "International Delegate (IADR Member)", 
-      "International Delegate (Non-IADR Member)"
+      "International Delegate (IADR Member)"
     ],
     discountType: "fixed", // "fixed" or "percentage"
     discountValue: 410, // For International Delegate categories, set price to $410
