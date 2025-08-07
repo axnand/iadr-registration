@@ -107,16 +107,28 @@ export default function RegistrationForm() {
         eventType: value,
         category: value === "IADR-APR" ? iadrCategories[0] : WW9ComboCategories[0],
       }));
+      resetCoupon();
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
+      resetCoupon();
+    }
+  };
+
+  const resetCoupon = () => {
+    if (couponApplied) {
+      setCouponInput("");
+      setAppliedCoupon("");
+      setCouponApplied(false);
+      setCouponMessage("");
+      toast.info("Coupon removed due to category change.");
     }
   };
 
     const handleApplyCoupon = () => {
-    const couponCode = formData.couponCode.trim().toUpperCase();
+    const couponCode = couponInput.trim().toUpperCase();
 
     if (couponCode === "IADR2025" && 
         (formData.category === "International Delegate (IADR Member)" || 
@@ -365,7 +377,7 @@ export default function RegistrationForm() {
   <div className="border-t-transparent border-[#377DFF] w-8 h-8 border-4 border-solid rounded-full animate-spin"></div>
 </div>
 ):
-<div className="w-full h-full ">
+<div className="w-full h-full font-medium">
       <div className="py-5 shadow-md ">
         <Link href={"https://iadrapr2025.com"}>
           <div
@@ -719,7 +731,7 @@ export default function RegistrationForm() {
                     <button
                       type="button"   
                       onClick={handleApplyCoupon}
-                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 whitespace-nowrap"
+                      className="bg-green-600 text-white px-4 py-2 rounded transition font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 whitespace-nowrap"
                     >
                       Apply
                     </button>
