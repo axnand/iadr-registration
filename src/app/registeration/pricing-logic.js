@@ -17,6 +17,60 @@ async function getUsdToInrRate() {
 
 // -------------- UPDATED PRICING TABLES -------------- //
 
+const validCoupons = {
+  "IADR2025": {
+    applicableCategories: [
+      "International Delegate (IADR Member)", 
+      "International Delegate (Non-IADR Member)"
+    ],
+    discountType: "fixed", // "fixed" or "percentage"
+    discountValue: 410, // For International Delegate categories, set price to $410
+    currency: "USD",
+    description: "Special discount for International Delegates"
+  }
+  // You can add more coupons here in the future
+};
+
+function validateAndApplyCoupon(couponCode, category, originalAmount, currency) {
+  if (!couponCode || couponCode.trim() === '') {
+    return { isValid: false, discount: 0, finalAmount: originalAmount };
+  }
+
+  const coupon = validCoupons[couponCode.toUpperCase()];
+  
+  if (!coupon) {
+    return { isValid: false, discount: 0, finalAmount: originalAmount };
+  }
+
+  // Check if the coupon is applicable to the current category
+  if (!coupon.applicableCategories.includes(category)) {
+    return { isValid: false, discount: 0, finalAmount: originalAmount };
+  }
+
+  let discount = 0;
+  let finalAmount = originalAmount;
+
+  if (coupon.discountType === "fixed" && coupon.currency === currency) {
+    // For IADR2025 coupon: Set total to $410 (41000 cents)
+    const targetAmount = coupon.discountValue * 100; // Convert to cents
+    if (originalAmount > targetAmount) {
+      discount = originalAmount - targetAmount;
+      finalAmount = targetAmount;
+    }
+  } else if (coupon.discountType === "percentage") {
+    discount = Math.round((originalAmount * coupon.discountValue) / 100);
+    finalAmount = originalAmount - discount;
+  }
+
+  return {
+    isValid: true,
+    discount: discount,
+    finalAmount: Math.max(0, finalAmount), // Ensure final amount is not negative
+    discountDescription: coupon.description
+  };
+}
+
+
 const iadrAprPricing = {
   "ISDR Member": { 
     earlyBird: { fee: 15340, convenienceFee: 360 }, 
@@ -95,7 +149,7 @@ function getPricingTier(currentDate) {
   return "late";
 }
 
-export async function calculateTotalAmount(category, eventType, numberOfAccompanying, currentDate) {
+export async function calculateTotalAmount(category, eventType, numberOfAccompanying, currentDate, couponCode = "") {
   const pricingTier = getPricingTier(currentDate);
   let baseFee = 0;
   let convenienceFee = 0;
@@ -117,12 +171,10 @@ export async function calculateTotalAmount(category, eventType, numberOfAccompan
     currency = pricing.currency;
   }
 
-  let totalAmount = { amount: baseFee + convenienceFee, currency, baseFee, convenienceFee };
+  let totalAmountBeforeCoupon = baseFee + convenienceFee;
 
   // Handle accompanying person charges if applicable
-  if (numberOfAccompanying > 0) {
-    // If category is an international delegate, allow only one accompanying person
-    // and set the additional charge equal to the base fee + convenience fee.
+  if (numberOfAccompanying > 0) {   
     if (category.includes("International Delegate")) {
       numberOfAccompanying = 1;
       totalAmount.amount += baseFee + convenienceFee;
@@ -150,14 +202,33 @@ export async function calculateTotalAmount(category, eventType, numberOfAccompan
           accompanyConvenienceFee = Math.round(accompanyConvenienceFee * usdToInrRate);
         }
 
-        totalAmount.amount += (accompanyCharge + accompanyConvenienceFee) * numberOfAccompanying;
+        totalAmountBeforeCoupon += (accompanyCharge + accompanyConvenienceFee) * numberOfAccompanying;
       }
     }
   }
 
-  // Convert to smallest currency unit.
-  // For INR, multiply by 100 (paise) and for USD, multiply by 100 (cents).
-  totalAmount.amount = Math.round(totalAmount.amount * 100);
+  const couponResult = validateAndApplyCoupon(
+    couponCode, 
+    category, 
+    totalAmountBeforeCoupon * 100, 
+    currency
+  );
 
-  return totalAmount;
+  let finalAmount = couponResult.isValid ? couponResult.finalAmount : totalAmountBeforeCoupon * 100;
+  let discount = couponResult.isValid ? couponResult.discount : 0;
+
+  let totalAmount = {
+    amount: finalAmount,
+    currency,
+    baseFee: currency === "INR" ? `₹${baseFee}` : `$${baseFee}`,
+    convenienceFee: currency === "INR" ? `₹${convenienceFee}` : `$${convenienceFee}`
+  };
+
+    if (couponResult.isValid && discount > 0) {
+    totalAmount.discount = currency === "INR" ? `₹${(discount / 100).toFixed(2)}` : `$${(discount / 100).toFixed(2)}`;
+    totalAmount.couponApplied = true;
+    totalAmount.couponCode = couponCode;
+    totalAmount.originalAmount = totalAmountBeforeCoupon * 100;
+  }
+    return totalAmount;
 }

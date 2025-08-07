@@ -318,7 +318,7 @@ export default function AccommodationForm() {
             <div
               className="p-4 flex justify-start md:h-24 h-20 w-full"
               style={{
-                backgroundImage: 'url(/logo.jpg)',
+                backgroundImage: 'url(/logo2.png)',
                 backgroundSize: "contain",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",

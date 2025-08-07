@@ -47,11 +47,16 @@ export default function RegistrationForm() {
     accompanying: "No",
     numberOfAccompanying: 0,
     accompanyingPersons: [],
+    couponCode: "",
   });
   const [totalAmount, setTotalAmount] = useState(0);
   const [errors, setErrors] = useState({});
   const [registrationComplete, setRegistrationComplete] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState("");
 
 
   // Recalculate total based on pricing logic
@@ -66,14 +71,15 @@ export default function RegistrationForm() {
         formData.category,
         formData.eventType,
         formData.numberOfAccompanying,
-        new Date()
+        new Date(),
+        appliedCoupon 
       );
 
       setTotalAmount(calculatedTotal);
       console.log(calculatedTotal);
     }
     updateTotal();
-  }, [formData.category, formData.eventType, formData.numberOfAccompanying]);
+  }, [formData.category, formData.eventType, formData.numberOfAccompanying, appliedCoupon]);
 
   
 
@@ -109,6 +115,42 @@ export default function RegistrationForm() {
     }
   };
 
+    const handleApplyCoupon = () => {
+    const couponCode = formData.couponCode.trim().toUpperCase();
+
+    if (couponCode === "IADR2025" && 
+        (formData.category === "International Delegate (IADR Member)" || 
+         formData.category === "International Delegate (Non-IADR Member)")) {
+      setCouponApplied(true);
+      setAppliedCoupon(couponCode);
+      setCouponMessage("Coupon applied successfully! Special discount for International Delegates.");
+      toast.success("Coupon applied successfully!");
+    } else if (couponCode === "IADR2025") {
+      setAppliedCoupon("");
+      setCouponApplied(false);
+      setCouponMessage("This coupon is only valid for International Delegate categories.");
+      toast.error("This coupon is only valid for International Delegate categories.");
+    } else if (couponCode === "") {
+      setAppliedCoupon("");
+      setCouponApplied(false);
+      setCouponMessage("Please enter a coupon code.");
+      toast.error("Please enter a coupon code.");
+    } else {
+      setAppliedCoupon("");
+      setCouponApplied(false);
+      setCouponMessage("Invalid coupon code. Please check and try again.");
+      toast.error("Invalid coupon code. Please check and try again.");
+    }
+  };
+
+    const handleRemoveCoupon = () => {
+    setAppliedCoupon("");
+    setFormData((prev) => ({ ...prev, couponCode: "" }));
+    setCouponApplied(false);
+    setCouponMessage("");
+    toast.info("Coupon removed.");
+  };
+
   // If category includes "International Delegate", force accompanying count to 1.
   const handleAccompanyingChange = (value) => {
     setFormData((prev) => {
@@ -120,7 +162,7 @@ export default function RegistrationForm() {
         numberOfAccompanying: value === "Yes" ? (isInternational ? 1 : prev.numberOfAccompanying || 1) : 0,
         accompanyingPersons: value === "Yes" ? [{ name: "" }] : [],
       };
-    });
+    }); 
   };
 
   const handleAccompanyingPersonChange = (index, value) => {
@@ -204,7 +246,8 @@ export default function RegistrationForm() {
       formData.category,
       formData.eventType,
       formData.numberOfAccompanying,
-      new Date()
+      new Date(),
+      appliedCoupon
     );
 
     // const amount = 100;
@@ -242,9 +285,11 @@ export default function RegistrationForm() {
         // Submit the registration data along with the payment ID
         const registrationData = {
           ...formData,
+          couponCode: appliedCoupon,
           paymentId: response.razorpay_payment_id,
           amountPaid: amount / 100, 
           currency,
+          couponApplied: couponApplied,
         };
   
         try {
@@ -297,7 +342,7 @@ export default function RegistrationForm() {
     };
   
     const rzp = new window.Razorpay(options);
-    rzp.open();
+    rzp.open();   
   };
   
   
@@ -652,6 +697,57 @@ export default function RegistrationForm() {
                   </div>
                 ))}
 
+                <div className="text-[13px] bg-gray-50 p-4 rounded-lg border">
+                <label
+                  htmlFor="couponCode"
+                  className="block text-gray-700 font-medium pb-2 text-sm"
+                >
+                  Coupon Code (Optional)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="couponCode"
+                    name="couponCode"
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value)}  
+                    placeholder="Enter coupon code"
+                    className="border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    disabled={couponApplied}
+                  />
+                  {!couponApplied ? (
+                    <button
+                      type="button"   
+                      onClick={handleApplyCoupon}
+                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 whitespace-nowrap"
+                    >
+                      Apply
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 whitespace-nowrap"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                {couponMessage && (
+                  <p className={`text-xs mt-2 ${couponApplied ? 'text-green-600' : 'text-red-500'}`}>
+                    {couponMessage}
+                  </p>
+                )}
+                {couponApplied && (
+                  <div className="mt-2 flex items-center text-green-600">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                    </svg>
+                    <span className="text-xs font-medium">Coupon Applied Successfully!</span>
+                  </div>
+                )}
+              </div>
+
               {/* Row 12: Total Amount */}
               <div className="text-[13px]">
                 <label className="block text-gray-700 font-medium pb-2 text-sm">
@@ -670,7 +766,12 @@ export default function RegistrationForm() {
                         <div className="text-sm text-gray-500 font-normal mt-1">
                           Base Fee: <span className=" font-medium">{totalAmount.baseFee}</span> + 
                           Convenience Fee: <span className=" font-medium">{totalAmount.convenienceFee}</span>
-                        </div>
+                          {couponApplied && totalAmount.discount && (
+                            <>
+                              {" "}- Discount: <span className="font-medium text-green-600">{totalAmount.discount}</span>
+                            </>
+                          )}
+                        </div> 
                         :<></>
                       }
                     </div>
