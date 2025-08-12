@@ -2,7 +2,7 @@ export const PCC_DATA = [
     {
         title:
         'AI-integrated scientific research writing: From research question to publication',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/ai.jpg',
         type: 'Full Day',
         conductors: [
         'Dr Priyanka Kapoor (Jamia)',
@@ -18,7 +18,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Understanding the systematic review and meta-analysis',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/doctor.png',
         type: 'Half Day',
         conductors: ['Dr Rahul Morankar', 'Dr Pavithra Karthikeyan (AIIMS, New Delhi)'],
         fee: 1800,
@@ -27,7 +27,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Transforming Academic Research Into Journal Publications: A Practical Approach',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/journal_main.png',
         type: 'Half Day',
         conductors: ['Dr. Gauri kalra', 'Dr Dhruv Ahuja', 'Dr Alpa Gupta (Manav Rachna)'],
         fee: 1800,
@@ -36,7 +36,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Pediatric Rotary Endodontics & Space Maintainer Fabrication',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/space.png',
         type: 'Half Day',
         conductors: ['Dr Ganesh Jeevanandan', 'Dr Arthilakshmi Uthiraapathy (Chennai)'],
         fee: 1800,
@@ -45,7 +45,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Immediate Loading Implants',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/implants.png',
         type: 'Half Day',
         conductors: ['Dr. Ashish Kakar'],
         fee: 1800,
@@ -54,7 +54,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Applications of Diode Lasers in Dental Practice',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/laser.png',
         type: 'Half Day',
         conductors: ['Dr. Meenu Bhasin Professor, Periodontology, SRCDSR'],
         fee: 1800,
@@ -63,7 +63,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Impression & Temporization',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/impression.png',
         type: 'Half Day',
         conductors: ['Dr Priyanka Sikka'],
         fee: 1800,
@@ -72,7 +72,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Inhalation Sedation',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/sedation.png',
         type: 'Half Day',
         conductors: ['Dr. Kunal Gupta'],
         fee: 1800,
@@ -81,7 +81,7 @@ export const PCC_DATA = [
     },
     {
         title: 'Anterior Direct Composite Veneers',
-        imageUrl: '/pcc/image.png',
+        imageUrl: '/pcc/veneers.png',
         type: 'Half Day',
         conductors: ['Dr. S. Arun Suraj, Chennai'],
         fee: 1800,
