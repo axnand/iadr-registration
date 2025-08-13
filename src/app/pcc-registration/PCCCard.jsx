@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PCCCard({ title, type, conductors, fee, code, imageUrl, seatsAvailable }) {
   const [loading, setLoading] = useState(false);
@@ -105,7 +106,13 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
           email: formData.email,
           contact: formData.phone
         },
-        theme: { color: '#0ea5a1' }
+        theme: { color: '#0ea5a1' },
+        modal: {
+          ondismiss: () => {
+            toast.info("Payment cancelled");
+            setLoading(false);
+          }
+        }
       };
 
       new window.Razorpay(options).open();
@@ -114,7 +121,7 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
       toast.error(err.message || "Could not start registration");
       setLoading(false);
     }
-  }
+  } 
 
 
   return (
@@ -156,9 +163,9 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
       {/* Modal Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white rounded-lg p-6 w-full max-w-xl">
             <h2 className="text-xl font-bold mb-4">Register for {title}</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <input
                 type="text"
                 name="fullName"
@@ -186,11 +193,11 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
                 className="w-full border p-2 rounded"
                 required
               />
-              <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-gray-300 rounded">
+              <div className="flex justify-end gap-3 text-[13px] font-semibold">
+                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
                   Cancel
                 </button>
-                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">
+                <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 transition text-white rounded">
                   Proceed to Pay
                 </button>
               </div>
