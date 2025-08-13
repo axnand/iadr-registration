@@ -1,6 +1,5 @@
 'use client'
-import Head from 'next/head'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import PCCCard from './PCCCard'
 import Link from 'next/link'
 import { CalendarDays, MapPin, Clock } from "lucide-react";
@@ -10,100 +9,35 @@ import "react-toastify/dist/ReactToastify.css";
 
     
 
-export default function PCCPage() {
-  const [loadingCode, setLoadingCode] = useState(null)
+export default function PCCPage() {1
+  const [courseData, setCourseData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Open Razorpay checkout. This assumes your backend returns { orderId, amount, razorpayKey }
-  async function handleRegister(course) {
-    try {
-      setLoadingCode(course.code)
-      // call our Next.js API route which should create the Razorpay order and return order details
-      const res = await fetch('/api/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: course.fee * 100, courseCode: course.code, courseTitle: course.title })
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Failed to create order')
-
-      // dynamically load Razorpay script if not already loaded
-      if (!window.Razorpay) {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script')
-          s.src = 'https://checkout.razorpay.com/v1/checkout.js'
-          s.onload = resolve
-          s.onerror = reject
-          document.body.appendChild(s)
-        })
+  useEffect(() => {
+    async function fetchSeatCounts() {
+      try {
+        const updatedCourses = await Promise.all(
+          PCC_DATA.map(async (course) => {
+            try {
+              const res = await fetch(`/api/pcc-register/${course.code}/count`);
+              const data = await res.json();
+              return {
+                ...course,
+                seatsAvailable: data.success ? data.seatsAvailable : 0
+              };
+            } catch {
+              return { ...course, seatsAvailable: 0 };
+            }
+          })
+        );
+        setCourseData(updatedCourses);
+      } finally {
+        setLoading(false);
       }
-
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY, // your Razorpay Key ID from backend
-        amount: data.amount, // in paise
-        currency: 'INR',
-        name: 'PCC Registration',
-        description: course.title,
-        order_id: data.orderId,
-        handler: async function (response) {
-          toast.success("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
-          toast.success("Wait for the Confirmation Mail")
-          setLoading(true);
-        },
-        try {
-            const res = await fetch("/api/pcc-register", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(registrationData),
-            });
-            const data = await res.json();
-            if (data.success) {
-              setRegistrationComplete(true);
-              toast.success("Registration successful!");
-              setLoading(false);
-            } else {
-              toast.error("Payment succeeded, but registration failed: " + data.error);
-            }
-            const emailResponse = await fetch("/api/send-confirmation", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(registrationData),
-            });
-  
-            if (!emailResponse.ok) {
-              const emailError = await emailResponse.json();
-              throw new Error(emailError.message || "Failed to send confirmation email");
-            }
-  
-            const emailResult = await emailResponse.json();
-            console.log("Email result:", emailResult);
-            if (emailResult.response.success) {
-              toast.success("Confirmation email sent successfully!");
-            } else {
-              toast.error("Failed to send confirmation email: " + emailResult.message);
-            }
-          } catch (error) {
-            console.error("Error submitting registration:", error);
-            toast.error("Payment succeeded, but registration submission encountered an error.");
-          }
-        prefill: {
-          // You can prefill name/email/phone here if you have them
-        },
-        theme: {
-          color: '#0ea5a1' // teal-ish
-        }
-      }
-
-      const rzp = new window.Razorpay(options)
-      rzp.open()
-    } catch (err) {
-      console.error(err)
-      alert('Could not start payment: ' + (err.message || err))
-    } finally {
-      setLoadingCode(null)
     }
-  }
+    fetchSeatCounts();
+  }, []);
+
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -153,50 +87,30 @@ export default function PCCPage() {
             All fees include GST and convenience charges.
           </p>
         </div>
+         {loading ? (
+          // Skeleton Loader
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+            {[...Array(PCC_DATA.length)].map((_, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-xl shadow-lg p-4 animate-strongPulse h-96"
+              >
+                <div className="h-40 bg-gray-200 rounded mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
-      {PCC_DATA.map((course) => (
-        <PCCCard key={course.code} {...course} />
-      ))}
-    </div>
+          {PCC_DATA.map((course) => (
+            <PCCCard key={course.code} {...course} />
+          ))}
+        </div>
+        )}
       </main>
     </main>
   )
 }
 
-/* -----------------------------------------------------------------------------
-  Backend stub: place this as /pages/api/create-order.js (or in /app/api if using app router)
-  -----------------------------------------------------------
-  // pages/api/create-order.js
-  import Razorpay from 'razorpay'
 
-  export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' })
-
-    const { amount, courseCode, courseTitle } = req.body
-
-    // initialize Razorpay with your keys (store keys in environment variables)
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET
-    })
-
-    try {
-      const options = {
-        amount: amount, // in paise
-        currency: 'INR',
-        receipt: `rcpt_${courseCode}_${Date.now()}`,
-        payment_capture: 1
-      }
-      const order = await razorpay.orders.create(options)
-      return res.status(200).json({ orderId: order.id, amount: order.amount, razorpayKey: process.env.RAZORPAY_KEY_ID })
-    } catch (err) {
-      console.error(err)
-      res.status(500).json({ message: 'Failed to create order' })
-    }
-  }
-
-  Notes:
-  - Verify payments server-side after the Razorpay handler sends payment details.
-  - Keep your Razorpay keys in environment variables and never commit them.
-
-  -----------------------------------------------------------------------------*/

@@ -12,9 +12,9 @@ export const PCC_DATA = [
         'Dr Arpit Gupta (PGIMER)',
         'Dr Harneet (Jamia)'
         ],
-        fee: 3000,
+        fee: 1,
         code: 'F1',
-        pax: 30
+        pax: 2
     },
     {
         title: 'Understanding the systematic review and meta-analysis',
@@ -32,7 +32,7 @@ export const PCC_DATA = [
         conductors: ['Dr. Gauri kalra', 'Dr Dhruv Ahuja', 'Dr Alpa Gupta (Manav Rachna)'],
         fee: 1800,
         code: 'M2',
-        pax: ''
+        pax: '30'
     },
     {
         title: 'Pediatric Rotary Endodontics & Space Maintainer Fabrication',

@@ -1,6 +1,6 @@
 // src/app/api/send-course-email/route.js
 
-import sendCourseRegistrationEmail from "@/utils/sendCourseRegistrationEmail.js";
+import sendCourseRegistrationEmail from "@/utils/pccMail";
 
 export async function POST(req) {
   try {
