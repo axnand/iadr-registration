@@ -55,7 +55,6 @@ Your registration details are as follows:
 Payment ID: ${body.paymentId || 'N/A'}
 Course Code: ${body.courseCode}
 Course Name: ${course.title}
-Registration Date: ${formattedCourseDate}
 Amount Paid: ${body.currency === 'INR' ? '₹' : '$'}${body.amountPaid}
 
 We look forward to welcoming you to the course.
@@ -87,10 +86,6 @@ IADR APR 2025 Organizing Committee`,
               <tr>
                 <td style="padding:8px; border:1px solid #ddd;"><strong>Course Name:</strong></td>
                 <td style="padding:8px; border:1px solid #ddd;">${course.title}</td>
-              </tr>
-              <tr>
-                <td style="padding:8px; border:1px solid #ddd;"><strong>Registration Date:</strong></td>
-                <td style="padding:8px; border:1px solid #ddd;">${formattedCourseDate}</td>
               </tr>
               <tr>
                 <td style="padding:8px; border:1px solid #ddd;"><strong>Amount Paid:</strong></td>

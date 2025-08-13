@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function PCCCard({ title, type, conductors, fee, code, imageUrl, seatsAvailable }) {
   const [loading, setLoading] = useState(false);
+  const [processingRegistration, setProcessingRegistration] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ fullName: '', email: '', phone: '' });
 
@@ -24,12 +25,12 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
   async function handleSubmit(e) {
     e.preventDefault();
     if (!emailRegex.test(formData.email)) {
-      alert("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return;
       }
 
       if (!phoneRegex.test(formData.phone)) {
-        alert("Please enter a valid phone number");
+        toast.error("Please enter a valid phone number");
         return;
       }
     setLoading(true);
@@ -65,7 +66,8 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
         name: 'PCC Registration',
         description: title,
         order_id: orderData.orderId,
-        handler: async function () {
+        handler: async function (response) {
+          setProcessingRegistration(true);
           try {
             toast.success("Payment successful!");
 
@@ -101,6 +103,7 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
             console.error(err);
             toast.error(err.message || "Something went wrong after payment");
           } finally {
+            setProcessingRegistration(false);
             setLoading(false);
           }
         },
@@ -206,6 +209,15 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {processingRegistration && (
+        <div className="fixed inset-0 bg-white flex flex-col justify-center items-center z-50">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-500 border-t-transparent mb-6"></div>
+          <p className="text-lg font-semibold text-gray-700 text-center px-4">
+            Processing registration...<br />Wait for confirmation email.<br />Do not close this screen.
+          </p>
         </div>
       )}
     </>
