@@ -62,7 +62,7 @@ export default function PCCPage() {1
           </p>
           {/* Course Selection Rules */}
             <div className="mt-4 px-5 py-4 text-sm font-semibold bg-white text-red-600 rounded-md shadow-md max-w-3xl">
-              <h2 className="font-bold text-base mb-2">Course Selection Rules</h2>
+              <h2 className="font-bold text-base mb-2">Note:</h2>
               <p className="mb-2">You may register for:</p>
               <ul className="list-disc list-inside mb-2">
                 <li>One Morning Half course and/or one Afternoon Half course, OR</li>
