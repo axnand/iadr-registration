@@ -60,6 +60,22 @@ export default function PCCPage() {1
           <p className="mt-2 sm:text-lg text-md text-center max-w-3xl">
             Enhance your skills with our comprehensive hands-on courses led by renowned experts.
           </p>
+          {/* Course Selection Rules */}
+            <div className="mt-4 px-5 py-4 text-sm font-semibold bg-white text-red-600 rounded-md shadow-md max-w-3xl">
+              <h2 className="font-bold text-base mb-2">Course Selection Rules</h2>
+              <p className="mb-2">You may register for:</p>
+              <ul className="list-disc list-inside mb-2">
+                <li>One Morning Half course and/or one Afternoon Half course, OR</li>
+                <li>One Full-Day course</li>
+              </ul>
+              <p className="font-semibold">Please note:</p>
+              <ul className="list-disc list-inside">
+                <li>You cannot register for more than one Morning Half course.</li>
+                <li>You cannot register for more than one Afternoon Half course.</li>
+                <li>A Full-Day course takes the entire day, so you cannot take any other course on that day.</li>
+              </ul>
+            </div>
+
           <div className="flex flex-wrap justify-center sm:text-base text-sm gap-6 mt-8 mb-5 text-blue-100">
               <div className="flex items-center gap-2">
                 <CalendarDays className="w-5 h-5" />
