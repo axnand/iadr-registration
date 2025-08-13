@@ -38,17 +38,55 @@ export default function PCCPage() {
       }
 
       const options = {
-        key: data.razorpayKey, // your Razorpay Key ID from backend
+        key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY, // your Razorpay Key ID from backend
         amount: data.amount, // in paise
         currency: 'INR',
-        name: 'Conference PCC Registration',
+        name: 'PCC Registration',
         description: course.title,
         order_id: data.orderId,
-        handler: function (response) {
-          // on successful payment, you will receive razorpay_payment_id, razorpay_order_id, razorpay_signature
-          // You should verify the payment on the server side.
-          alert('Payment successful! Payment ID: ' + response.razorpay_payment_id)
+        handler: async function (response) {
+          toast.success("Payment successful! Razorpay Payment ID: " + response.razorpay_payment_id);
+          toast.success("Wait for the Confirmation Mail")
+          setLoading(true);
         },
+        try {
+            const res = await fetch("/api/pcc-register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(registrationData),
+            });
+            const data = await res.json();
+            if (data.success) {
+              setRegistrationComplete(true);
+              toast.success("Registration successful!");
+              setLoading(false);
+            } else {
+              toast.error("Payment succeeded, but registration failed: " + data.error);
+            }
+            const emailResponse = await fetch("/api/send-confirmation", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(registrationData),
+            });
+  
+            if (!emailResponse.ok) {
+              const emailError = await emailResponse.json();
+              throw new Error(emailError.message || "Failed to send confirmation email");
+            }
+  
+            const emailResult = await emailResponse.json();
+            console.log("Email result:", emailResult);
+            if (emailResult.response.success) {
+              toast.success("Confirmation email sent successfully!");
+            } else {
+              toast.error("Failed to send confirmation email: " + emailResult.message);
+            }
+          } catch (error) {
+            console.error("Error submitting registration:", error);
+            toast.error("Payment succeeded, but registration submission encountered an error.");
+          }
         prefill: {
           // You can prefill name/email/phone here if you have them
         },
