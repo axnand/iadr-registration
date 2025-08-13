@@ -12,7 +12,7 @@ export const PCC_DATA = [
         'Dr Arpit Gupta (PGIMER)',
         'Dr Harneet (Jamia)'
         ],
-        fee: 1,
+        fee: 3000,
         code: 'F1',
         pax: 30
     },
