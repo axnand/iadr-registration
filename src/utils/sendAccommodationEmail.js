@@ -87,7 +87,7 @@ IADR APR 2025 Organizing Committee`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
             <div style="text-align: center; margin-bottom: 20px;">
-              <img src="https://iadrapr2025.com/wp-content/uploads/2025/02/logo-1.jpg" alt="IADR APR 2025 Logo" style="max-width: 150px;" />
+              <img src="https://iadrapr2025.com/wp-content/uploads/2025/07/indian-society-for-dental-resear-768x160.png" alt="IADR APR 2025 Logo" style="max-width: 150px;" />
             </div>
             
             <h1 style="color: #1063a5; text-align: center;">Accommodation Booking Confirmation</h1>

@@ -80,7 +80,7 @@ export default async function sendConfirmationEmail(body) {
           <div style="max-width:600px; margin:20px auto; background:#fff; border:1px solid #eaeaea;">
             <!-- Header with company logo -->
             <div style="background:#1063a5; padding:20px; text-align:center;">
-              <img src="https://iadrapr2025.com/wp-content/uploads/2025/02/logo-1.jpg" alt="Company Logo" style="max-width:150px;" />
+              <img src="https://iadrapr2025.com/wp-content/uploads/2025/07/indian-society-for-dental-resear-768x160.png" alt="Company Logo" style="max-width:150px;" />
             </div>
             
             <!-- Email content -->

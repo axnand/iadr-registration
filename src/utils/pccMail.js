@@ -52,10 +52,10 @@ export default async function sendCourseRegistrationEmail(body) {
 Thank you for registering for the PCC course at IADR APR 2025.
 
 Your registration details are as follows:
-Registration ID: ${body.paymentId || 'N/A'}
+Payment ID: ${body.paymentId || 'N/A'}
 Course Code: ${body.courseCode}
 Course Name: ${course.title}
-Course Date: ${formattedCourseDate}
+Registration Date: ${formattedCourseDate}
 Amount Paid: ${body.currency === 'INR' ? '₹' : '$'}${body.amountPaid}
 
 We look forward to welcoming you to the course.
@@ -66,7 +66,7 @@ IADR APR 2025 Organizing Committee`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://iadrapr2025.com/wp-content/uploads/2025/02/logo-1.jpg" alt="IADR APR 2025 Logo" style="max-width: 150px;" />
+            <img src="https://iadrapr2025.com/wp-content/uploads/2025/07/indian-society-for-dental-resear-768x160.png" alt="IADR APR 2025 Logo" style="max-width: 150px;" />
           </div>
 
           <h1 style="color: #1063a5; text-align: center;">PCC Course Registration Confirmation</h1>
@@ -77,7 +77,7 @@ IADR APR 2025 Organizing Committee`,
           <div style="background-color: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <table style="width:100%; border-collapse: collapse;">
               <tr>
-                <td style="padding:8px; border:1px solid #ddd;"><strong>Registration ID:</strong></td>
+                <td style="padding:8px; border:1px solid #ddd;"><strong>Payment ID:</strong></td>
                 <td style="padding:8px; border:1px solid #ddd;">${body.paymentId || 'N/A'}</td>
               </tr>
               <tr>
@@ -89,7 +89,7 @@ IADR APR 2025 Organizing Committee`,
                 <td style="padding:8px; border:1px solid #ddd;">${course.title}</td>
               </tr>
               <tr>
-                <td style="padding:8px; border:1px solid #ddd;"><strong>Course Date:</strong></td>
+                <td style="padding:8px; border:1px solid #ddd;"><strong>Registration Date:</strong></td>
                 <td style="padding:8px; border:1px solid #ddd;">${formattedCourseDate}</td>
               </tr>
               <tr>

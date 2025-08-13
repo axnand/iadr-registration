@@ -1,4 +1,4 @@
-// src/app/api/send-course-email/route.js
+
 
 import sendCourseRegistrationEmail from "@/utils/pccMail";
 
