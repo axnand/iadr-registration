@@ -170,7 +170,7 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg p-6 mx-6 w-full max-w-xl">
-            <h2 className="text-xl font-bold mb-4">Register for {title}</h2>
+            <h2 className="sm:text-xl text-[15px] font-bold mb-4">Register for {title}</h2>
             <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <input
                 type="text"
