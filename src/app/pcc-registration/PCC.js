@@ -14,7 +14,7 @@ export const PCC_DATA = [
         ],
         fee: 1,
         code: 'F1',
-        pax: 2
+        pax: 30
     },
     {
         title: 'Understanding the systematic review and meta-analysis',

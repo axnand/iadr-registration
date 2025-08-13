@@ -1,4 +1,4 @@
-// app/api/pcc-registrations/route.js
+// app/api/pcc-register/route.js
 
 import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/dbConnect";
@@ -47,6 +47,63 @@ export async function POST(request) {
     });
 
     return NextResponse.json({ success: true, registration }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// PUT update existing registration
+export async function PUT(request) {
+  try {
+    await dbConnect();
+    const { _id, fullName, phone, email, courseCode, courseName, courseDate } = await request.json();
+
+    if (!_id) {
+      return NextResponse.json({ success: false, error: "Registration ID is required" }, { status: 400 });
+    }
+
+    // Find and update the registration
+    const registration = await PCCRegistration.findByIdAndUpdate(
+      _id,
+      {
+        fullName,
+        phone,
+        email,
+        courseCode,
+        courseName,
+        courseDate
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!registration) {
+      return NextResponse.json({ success: false, error: "Registration not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, registration });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// DELETE registration
+export async function DELETE(request) {
+  try {
+    await dbConnect();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: "Registration ID is required" }, { status: 400 });
+    }
+
+    const registration = await PCCRegistration.findByIdAndDelete(id);
+
+    if (!registration) {
+      return NextResponse.json({ success: false, error: "Registration not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: "Registration deleted successfully" });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
