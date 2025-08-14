@@ -20,14 +20,17 @@ async function getUsdToInrRate() {
 const validCoupons = {
   "IADR2025": {
     applicableCategories: [
-      "International Delegate (IADR Member)"
+      "International Delegate (IADR Member)",
+      "International Delegate (Non-IADR Member)"
     ],
     discountType: "fixed", // "fixed" or "percentage"
-    discountValue: 410, // For International Delegate categories, set price to $410
+    discountValues: {
+      "International Delegate (IADR Member)": 410,
+      "International Delegate (Non-IADR Member)": 512
+    },
     currency: "USD",
     description: "Special discount for International Delegates"
   }
-  // You can add more coupons here in the future
 };
 
 function validateAndApplyCoupon(couponCode, category, originalAmount, currency) {
@@ -50,8 +53,7 @@ function validateAndApplyCoupon(couponCode, category, originalAmount, currency) 
   let finalAmount = originalAmount;
 
   if (coupon.discountType === "fixed" && coupon.currency === currency) {
-    // For IADR2025 coupon: Set total to $410 (41000 cents)
-    const targetAmount = coupon.discountValue * 100; // Convert to cents
+    const targetAmount = coupon.discountValues[category] * 100;
     if (originalAmount > targetAmount) {
       discount = originalAmount - targetAmount;
       finalAmount = targetAmount;
@@ -64,7 +66,7 @@ function validateAndApplyCoupon(couponCode, category, originalAmount, currency) 
   return {
     isValid: true,
     discount: discount,
-    finalAmount: Math.max(0, finalAmount), // Ensure final amount is not negative
+    finalAmount: Math.max(0, finalAmount),
     discountDescription: coupon.description
   };
 }
@@ -170,41 +172,9 @@ export async function calculateTotalAmount(category, eventType, numberOfAccompan
     currency = pricing.currency;
   }
 
+  const originalBaseFee = baseFee;
+  const originalConvenienceFee = convenienceFee;
   let totalAmountBeforeCoupon = baseFee + convenienceFee;
-
-  // Handle accompanying person charges if applicable
-  if (numberOfAccompanying > 0) {   
-    if (category.includes("International Delegate")) {
-      numberOfAccompanying = 1;
-      totalAmount.amount += baseFee + convenienceFee;
-    } else {
-      // Use a fixed key for accompanying person pricing based on the event type.
-      const accompanyKey = eventType === "IADR-APR" ? "Accompanying Person (Non-Dentist)" : "Accompanying Person";
-      if (accompanyingPersonPricing[eventType] && accompanyingPersonPricing[eventType][accompanyKey]) {
-        let accompanyCharge = 0;
-        let accompanyConvenienceFee = 0;
-        const accompanyCurrency = accompanyingPersonPricing[eventType][accompanyKey].currency || "INR";
-
-        if (eventType === "IADR-APR") {
-          // For IADR-APR, use tier-based pricing
-          const accompanyPricing = accompanyingPersonPricing[eventType][accompanyKey][pricingTier];
-          accompanyCharge = accompanyPricing.fee;
-          accompanyConvenienceFee = accompanyPricing.convenienceFee;
-        } else {
-          // For other events, use fixed amount
-          accompanyCharge = accompanyingPersonPricing[eventType][accompanyKey].amount || 0;
-        }
-
-        // If accompanying fee is in USD but our base fee is in INR, convert the accompanying fee.
-        if (accompanyCurrency === "USD" && currency === "INR") {
-          accompanyCharge = Math.round(accompanyCharge * usdToInrRate);
-          accompanyConvenienceFee = Math.round(accompanyConvenienceFee * usdToInrRate);
-        }
-
-        totalAmountBeforeCoupon += (accompanyCharge + accompanyConvenienceFee) * numberOfAccompanying;
-      }
-    }
-  }
 
   const couponResult = validateAndApplyCoupon(
     couponCode, 
@@ -213,9 +183,41 @@ export async function calculateTotalAmount(category, eventType, numberOfAccompan
     currency
   );
 
-  let finalAmount = couponResult.isValid ? couponResult.finalAmount : totalAmountBeforeCoupon * 100;
+  let mainDelegateAmount = couponResult.isValid ? couponResult.finalAmount : totalAmountBeforeCoupon * 100;
   let discount = couponResult.isValid ? couponResult.discount : 0;
 
+  let accompanyingPersonTotal = 0;
+  if (numberOfAccompanying > 0) {   
+    if (category.includes("International Delegate")) {
+      numberOfAccompanying = 1;
+      accompanyingPersonTotal = (originalBaseFee + originalConvenienceFee) * numberOfAccompanying * 100;
+    } else {
+      const accompanyKey = eventType === "IADR-APR" ? "Accompanying Person (Non-Dentist)" : "Accompanying Person";
+      if (accompanyingPersonPricing[eventType] && accompanyingPersonPricing[eventType][accompanyKey]) {
+        let accompanyCharge = 0;
+        let accompanyConvenienceFee = 0;
+        const accompanyCurrency = accompanyingPersonPricing[eventType][accompanyKey].currency || "INR";
+
+        if (eventType === "IADR-APR") {
+          const accompanyPricing = accompanyingPersonPricing[eventType][accompanyKey][pricingTier];
+          accompanyCharge = accompanyPricing.fee;
+          accompanyConvenienceFee = accompanyPricing.convenienceFee;
+        } else {
+          accompanyCharge = accompanyingPersonPricing[eventType][accompanyKey].amount || 0;
+        }
+
+        
+        if (accompanyCurrency === "USD" && currency === "INR") {
+          accompanyCharge = Math.round(accompanyCharge * usdToInrRate);
+          accompanyConvenienceFee = Math.round(accompanyConvenienceFee * usdToInrRate);
+        }
+
+        accompanyingPersonTotal = (accompanyCharge + accompanyConvenienceFee) * numberOfAccompanying * 100;
+      }
+    }
+  }
+
+  let finalAmount = mainDelegateAmount + accompanyingPersonTotal;
   let totalAmount = {
     amount: finalAmount,
     currency,
@@ -227,7 +229,7 @@ export async function calculateTotalAmount(category, eventType, numberOfAccompan
     totalAmount.discount = currency === "INR" ? `₹${(discount / 100).toFixed(2)}` : `$${(discount / 100).toFixed(2)}`;
     totalAmount.couponApplied = true;
     totalAmount.couponCode = couponCode;
-    totalAmount.originalAmount = totalAmountBeforeCoupon * 100;
+    totalAmount.originalAmount = (totalAmountBeforeCoupon * 100) + accompanyingPersonTotal;
   }
     return totalAmount;
 }
