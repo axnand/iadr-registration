@@ -99,10 +99,10 @@ export default function SendPaymentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3A64B0] flex items-center justify-center p-8">
+    <div className="min-h-screen bg-[#3A64B0] flex items-center justify-center p-6">
       <ToastContainer position="top-right" autoClose={5000} />
       
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
         
         {/* Logo */}
         <div className="flex justify-center mb-6">
