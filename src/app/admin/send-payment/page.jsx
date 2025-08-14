@@ -78,16 +78,7 @@ export default function SendPaymentPage() {
         return;
       }
 
-      toast.success(
-        <a
-          href={linkData.short_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline font-medium"
-        >
-          Payment link created — click to view
-        </a>
-      );
+        toast.success("Payment link created successfully!");
 
       // Optionally clear form
       setForm({
