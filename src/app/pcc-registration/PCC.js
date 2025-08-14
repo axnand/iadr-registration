@@ -35,15 +35,6 @@ export const PCC_DATA = [
         pax: '30'
     },
     {
-        title: 'Pediatric Rotary Endodontics & Space Maintainer Fabrication',
-        imageUrl: '/pcc/space.png',
-        type: 'Morning Half',
-        conductors: ['Dr Ganesh Jeevanandan', 'Dr Arthilakshmi Uthiraapathy (Chennai)'],
-        fee: 1800,
-        code: 'M3',
-        pax: 30
-    },
-    {
         title: 'Immediate Loading Implants',
         imageUrl: '/pcc/implants.png',
         type: 'Morning Half',
