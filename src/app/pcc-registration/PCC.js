@@ -53,7 +53,7 @@ export const PCC_DATA = [
         pax: 30
     },
     {
-        title: 'Impression & Temporization',
+        title: 'Bio Imitative Posterior Work Flow for Everyday Dentistry',
         imageUrl: '/pcc/impression.png',
         type: 'Afternoon Half',
         conductors: ['Dr Priyanka Sikka'],
