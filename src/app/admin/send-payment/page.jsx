@@ -108,7 +108,7 @@ export default function SendPaymentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#3A64B0] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#3A64B0] flex items-center justify-center p-8">
       <ToastContainer position="top-right" autoClose={5000} />
       
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
@@ -123,12 +123,12 @@ export default function SendPaymentPage() {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+        <h1 className="sm:text-2xl text-lg font-bold text-center text-gray-800 mb-6">
           Send Payment Request
         </h1>
 
         {/* Form */}
-        <form onSubmit={handleSend} className="space-y-4 text-[15px]">
+        <form onSubmit={handleSend} className="space-y-4 sm:text-[15px] text-[13px]">
           <input 
             name="fullName" 
             placeholder="Full Name" 
