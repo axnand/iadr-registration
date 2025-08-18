@@ -115,12 +115,12 @@ const iadrAprPricing = {
     late: { fee: 700, convenienceFee: 17 }, 
     currency: "USD" 
   },
-  "Domestic Student Presenting Paper": { 
-    earlyBird: { fee: 10620, convenienceFee: 250 }, 
-    standard: { fee: 10620, convenienceFee: 250 }, 
-    late: { fee: 10620, convenienceFee: 250 }, 
-    currency: "INR" 
-  },
+  // "Domestic Student Presenting Paper": { 
+  //   earlyBird: { fee: 10620, convenienceFee: 250 }, 
+  //   standard: { fee: 10620, convenienceFee: 250 }, 
+  //   late: { fee: 10620, convenienceFee: 250 }, 
+  //   currency: "INR" 
+  // },
 };
 
 
