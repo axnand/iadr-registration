@@ -23,7 +23,7 @@ const validCoupons = {
       "International Delegate (IADR Member)",
       "International Delegate (Non-IADR Member)"
     ],
-    discountType: "fixed", // "fixed" or "percentage"
+    discountType: "fixed", 
     discountValues: {
       "International Delegate (IADR Member)": 410,
       "International Delegate (Non-IADR Member)": 512

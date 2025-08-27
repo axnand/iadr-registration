@@ -65,7 +65,7 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
         currency: 'INR',
         name: 'PCC Registration',
         description: title,
-        order_id: orderData.orderId,
+        order_id: orderData.id,
         handler: async function (response) {
           setProcessingRegistration(true);
           try {
