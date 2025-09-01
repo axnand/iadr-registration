@@ -17,7 +17,7 @@ const iadrCategories = [
   "Student (Non-Member)",
   "International Delegate (IADR Member)",
   "International Delegate (Non-IADR Member)",
-  "Domestic Student Presenting Paper",
+  // "Domestic Student Presenting Paper",
 ];
 
 const WW9ComboCategories = [
