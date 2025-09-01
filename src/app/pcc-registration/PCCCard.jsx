@@ -76,7 +76,7 @@ export default function PCCCard({ title, type, conductors, fee, code, imageUrl, 
               courseCode: code,
               courseName: title,
               paymentId: response.razorpay_payment_id || 'N/A', 
-              amountPaid: orderData.amount / 100, 
+              amount: orderData.amount / 100, 
               currency: 'INR', 
               registrationDate: new Date().toISOString() 
             };

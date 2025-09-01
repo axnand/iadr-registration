@@ -20,7 +20,8 @@ export async function GET() {
 export async function POST(request) {
   try {
     await dbConnect();
-    const { fullName, phone, email, courseCode, courseDate } = await request.json();
+    // ✅ Fixed: Added amount to destructuring
+    const { fullName, phone, email, courseCode, courseDate, paymentId, amount } = await request.json();
 
     // 1️⃣ Find course by code
     const course = PCC_DATA.find(c => c.code === courseCode);
@@ -37,14 +38,19 @@ export async function POST(request) {
     }
 
     // 3️⃣ Save registration
-    const registration = await PCCRegistration.create({
+    // ✅ Fixed: Handle amount properly (convert empty string to null or 0)
+    const registrationData = {
       fullName,
       phone,
       email,
       courseCode,
       courseName: course.title,
-      courseDate
-    });
+      courseDate,
+      paymentId: paymentId || null,
+      amount: amount && amount !== "" ? Number(amount) : 0
+    };
+
+    const registration = await PCCRegistration.create(registrationData);
 
     return NextResponse.json({ success: true, registration }, { status: 201 });
   } catch (error) {
@@ -56,23 +62,29 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     await dbConnect();
-    const { _id, fullName, phone, email, courseCode, courseName, courseDate } = await request.json();
+    // ✅ Fixed: Added paymentId and amount to destructuring
+    const { _id, fullName, phone, email, courseCode, courseName, courseDate, paymentId, amount } = await request.json();
 
     if (!_id) {
       return NextResponse.json({ success: false, error: "Registration ID is required" }, { status: 400 });
     }
 
+    // ✅ Fixed: Added paymentId and amount to update object
+    const updateData = {
+      fullName,
+      phone,
+      email,
+      courseCode,
+      courseName,
+      courseDate,
+      paymentId: paymentId || null,
+      amount: amount && amount !== "" ? Number(amount) : 0
+    };
+
     // Find and update the registration
     const registration = await PCCRegistration.findByIdAndUpdate(
       _id,
-      {
-        fullName,
-        phone,
-        email,
-        courseCode,
-        courseName,
-        courseDate
-      },
+      updateData,
       { new: true, runValidators: true }
     );
 

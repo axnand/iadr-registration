@@ -7,7 +7,6 @@ import Link from "next/link";
 
 const courseCodes = ["F1", "M1", "M2", "M3", "M4", "A1", "A2", "A3", "A4"];
 
-
 const courseNames = [
   "AI-integrated scientific research writing: From research question to publication",
   "Understanding the systematic review and meta-analysis",
@@ -19,9 +18,6 @@ const courseNames = [
   "Inhalation Sedation",
   "Anterior Direct Composite Veneers"
 ];
-
-
-
 
 export default function AdminPCCRegistrationsPage() {
   const router = useRouter();
@@ -41,6 +37,8 @@ export default function AdminPCCRegistrationsPage() {
     email: "",
     courseName: courseNames[0] || "",
     courseCode: courseCodes[0] || "",
+    paymentId: "",
+    amount: "",
   });
 
   // Check for admin login on mount. If not logged in, redirect to login.
@@ -72,6 +70,7 @@ export default function AdminPCCRegistrationsPage() {
         const sortedRegistrations = data.registrations.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
+        console.log("data",data);
         setRegistrations(sortedRegistrations);
       } else {
         throw new Error(data.error);
@@ -180,6 +179,8 @@ export default function AdminPCCRegistrationsPage() {
           email: "",
           courseName: courseNames[0] || "",
           courseCode: courseCodes[0] || "",
+          paymentId: "",
+          amount: "",
         });
       } else {
         alert("Add entry failed: " + data.error);
@@ -191,7 +192,7 @@ export default function AdminPCCRegistrationsPage() {
     }
   };
 
-  // Filter registrations by search query (fullName, email, phone, or courseCode)
+  // Filter registrations by search query (fullName, email, phone, courseCode, or paymentId)
   const filteredRegistrations = registrations.filter((reg) => {
     const query = searchQuery.toLowerCase();
     return (
@@ -199,7 +200,8 @@ export default function AdminPCCRegistrationsPage() {
       reg.email.toLowerCase().includes(query) ||
       reg.phone.toLowerCase().includes(query) ||
       reg.courseCode.toLowerCase().includes(query) ||
-      reg.courseName.toLowerCase().includes(query)
+      reg.courseName.toLowerCase().includes(query) ||
+      (reg.paymentId && reg.paymentId.toLowerCase().includes(query))
     );
   });
 
@@ -242,7 +244,7 @@ export default function AdminPCCRegistrationsPage() {
           <div className="mb-4">
             <input
               type="text"
-              placeholder="Search by Name, Email, Phone, Course Code, or Course Name..."
+              placeholder="Search by Name, Email, Phone, Course Code, Course Name, or Payment ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="border p-2 w-full md:w-1/3 rounded"
@@ -309,6 +311,26 @@ export default function AdminPCCRegistrationsPage() {
                     </option>
                   ))}
                 </select>
+                {/* Payment ID */}
+                <input
+                  type="text"
+                  name="paymentId"
+                  placeholder="Payment ID"
+                  value={newEntryData.paymentId}
+                  onChange={handleNewEntryChange}
+                  className="border p-2"
+                />
+                {/* Amount */}
+                <input
+                  type="number"
+                  name="amount"
+                  placeholder="Amount"
+                  value={newEntryData.amount}
+                  onChange={handleNewEntryChange}
+                  className="border p-2"
+                  min="0"
+                  step="0.01"
+                />
               </div>
               <div className="mt-4 flex gap-x-4">
                 <button
@@ -346,6 +368,8 @@ export default function AdminPCCRegistrationsPage() {
                   <th className="px-4 py-2 border border-gray-300">Email</th>
                   <th className="px-4 py-2 border border-gray-300">Course Code</th>
                   <th className="px-4 py-2 border border-gray-300">Course Name</th>
+                  <th className="px-4 py-2 border border-gray-300">Payment ID</th>
+                  <th className="px-4 py-2 border border-gray-300">Amount</th>
                   <th className="px-4 py-2 border border-gray-300">Registered At</th>
                   <th className="px-4 py-2 border border-gray-300">Actions</th>
                 </tr>
@@ -435,6 +459,38 @@ export default function AdminPCCRegistrationsPage() {
                         <div className="max-w-xs truncate" title={reg.courseName}>
                           {reg.courseName}
                         </div>
+                      )}
+                    </td>
+                    {/* Payment ID */}
+                    <td className="px-4 py-2 border border-gray-300">
+                      {editingId === reg._id ? (
+                        <input
+                          type="text"
+                          name="paymentId"
+                          value={editData.paymentId || ""}
+                          onChange={handleEditChange}
+                          className="border p-1"
+                          placeholder="Payment ID"
+                        />
+                      ) : (
+                        reg.paymentId || "-"
+                      )}
+                    </td>
+                    {/* Amount */}
+                    <td className="px-4 py-2 border border-gray-300">
+                      {editingId === reg._id ? (
+                        <input
+                          type="number"
+                          name="amount"
+                          value={editData.amount || ""}
+                          onChange={handleEditChange}
+                          className="border p-1"
+                          placeholder="Amount"
+                          min="0"
+                          step="0.01"
+                        />
+                      ) : (
+                        reg.amount ? `₹${reg.amount}` : "-"
                       )}
                     </td>
                     {/* Registered At */}
