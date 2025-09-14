@@ -8,7 +8,7 @@ function Page() {
           Registrations are Closed
         </h1>
         <p className="text-gray-700 mb-4">
-          We thank all our colleagues for the enthusiasm shown to register for
+          We thank all our colleagues for the enthusiasm shown to register for  
           the <span className="font-semibold">IADR APR conference</span>.
         </p>
         <p className="text-gray-700 mb-4">
